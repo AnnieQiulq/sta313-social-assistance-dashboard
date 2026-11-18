@@ -181,3 +181,9 @@ main{max-width:1510px}.layout,.bottom-layout{grid-template-columns:minmax(0,3.05
 
 /* Taller, not wider: keep the locator in the map's lower-right corner. */
 .map .northern-panel #northInsetSvg{aspect-ratio:400/280!important;height:auto!important}
+
+/* Geographic dot map: all CMAs remain at their actual map positions. */
+.map .dot-boundary{opacity:.6}
+.map .cma-dot{filter:drop-shadow(0 1px 2px #25374635)}
+.map .cma-dot:hover,.map .cma-dot:focus{stroke:#172c3b;stroke-width:3.5px;outline:none}
+.map .maplabel{font-size:11px;paint-order:stroke;stroke:#f4f7f5;stroke-width:3px}
