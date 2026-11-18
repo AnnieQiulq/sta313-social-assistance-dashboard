@@ -23,8 +23,8 @@ function renderMap(){
  const path=d3.geoPath(projection);
 
  const context=d3.select('#contextLayer');
- context.selectAll('path.context-land').data(CONTEXT?.features||[]).join('path').attr('class','context-land').attr('d',path);
- const placeLabels=zoom==='all'?[['Lake Huron',-82.25,44.35,'water'],['Georgian Bay',-80.75,45.05,'water'],['Lake Ontario',-78.35,43.32,'water'],['Lake Erie',-81.15,42.55,'water'],['QUEBEC',-75.85,45.7,'region'],['UNITED STATES',-82.1,41.65,'region']]: [['Lake Ontario',-78.45,43.05,'water'],['Georgian Bay',-80.65,44.9,'water']];
+ context.selectAll('path.context-land').data((CONTEXT?.features||[]).filter(f=>String(f.properties?.PRUID)==='35')).join('path').attr('class','context-land').attr('d',path);
+ const placeLabels=zoom==='all'?[['Lake Huron',-82.25,44.35,'water'],['Georgian Bay',-80.75,45.05,'water'],['Lake Ontario',-78.35,43.32,'water'],['Lake Erie',-81.15,42.55,'water'],['UNITED STATES',-82.1,41.65,'region']]: [['Lake Ontario',-78.45,43.05,'water'],['Georgian Bay',-80.65,44.9,'water']];
  d3.select('#labels').selectAll('text.context-place').data(placeLabels,d=>d[0]).join('text').attr('class',d=>'context-place '+(d[3]==='water'?'context-water-label':'context-region-label')).attr('x',d=>Math.max(85,Math.min(575,projection([d[1],d[2]])?.[0]??-100))).attr('y',d=>Math.max(35,Math.min(460,projection([d[1],d[2]])?.[1]??-100))).attr('text-anchor','middle').text(d=>d[0]);
  const join=d3.select('#areas').selectAll('path.region').data(main,d=>d.properties.CMAUID);
  join.join(enter=>enter.append('path').attr('class','region').attr('tabindex',0).attr('role','button'),update=>update,exit=>exit.remove())
