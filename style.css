@@ -98,3 +98,9 @@ main{max-width:1510px}.layout,.bottom-layout{grid-template-columns:minmax(0,3.05
 .north-position-label{font-size:11px;font-weight:600;fill:#34475a;paint-order:stroke;stroke:#fff;stroke-width:3px}
 .north-label{font-size:12px;font-weight:650;fill:#243447}
 @media(max-width:850px){.combined-inset{width:58%}}
+
+/* Geographic northern Ontario inset */
+.inset.combined-inset{width:min(440px,52%);height:auto;padding:10px 12px;background:#f8f9f8;border:1px solid #9eacb6}
+.combined-inset #northInsetSvg{display:block;width:100%;height:auto;max-height:none;aspect-ratio:400/240;overflow:hidden}
+.combined-inset .north-position-label{font-size:12px;font-weight:650;fill:#25394b;stroke:#fff;stroke-width:3px;paint-order:stroke;pointer-events:none}
+@media(max-width:650px){.inset.combined-inset{width:min(290px,65%);height:auto;padding:7px}.combined-inset #northInsetSvg{height:auto}}
