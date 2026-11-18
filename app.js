@@ -19,7 +19,7 @@ function renderMap(){
  document.getElementById('map').classList.toggle('is-zoomed',zoom!=='all');
  const main=GEO.features.filter(f=>!insetNames.includes(CMA.find(c=>String(CODES[c[0]])===String(f.properties.CMAUID))?.[0]));
  const selection=zoom==='all'?main:main.filter(f=>['Toronto','Hamilton','Oshawa','Barrie','Guelph','Brantford','Kitchener–Cambridge–Waterloo','St. Catharines–Niagara','Peterborough'].some(name=>String(CODES[name])===String(f.properties.CMAUID)));
- const projection=d3.geoMercator().fitExtent(zoom==='all'?[[32,35],[625,450]]:[[40,32],[620,465]],{type:'FeatureCollection',features:selection});
+ const projection=d3.geoMercator().fitExtent(zoom==='all'?[[12,18],[648,483]]:[[25,20],[635,480]],{type:'FeatureCollection',features:selection});
  const path=d3.geoPath(projection);
 
  const context=d3.select('#contextLayer');
@@ -76,13 +76,13 @@ function renderMap(){
   const waterLabels=[['Lake Superior',-87.7,47.2],['Georgian Bay',-80.6,45.5],['Lake Huron',-82.4,45.5]];
   north.append('g').selectAll('text').data(waterLabels).join('text')
    .attr('class','north-water-label')
-   .attr('x',d=>northProjection([d[1],d[2]])[0])
-   .attr('y',d=>northProjection([d[1],d[2]])[1])
+   .attr('x',d=>Math.max(65,Math.min(330,northProjection([d[1],d[2]])[0])))
+   .attr('y',d=>Math.max(24,Math.min(210,northProjection([d[1],d[2]])[1])))
    .attr('text-anchor','middle').text(d=>d[0]);
   north.append('g').selectAll('text').data(northFeatures,d=>d.properties.CMAUID).join('text')
    .attr('class','north-position-label')
-   .attr('x',f=>northPath.centroid(f)[0])
-   .attr('y',f=>northPath.centroid(f)[1]-12)
+   .attr('x',f=>Math.max(68,Math.min(327,northPath.centroid(f)[0])))
+   .attr('y',f=>Math.max(24,Math.min(215,northPath.centroid(f)[1]-12)))
    .attr('text-anchor','middle').text(f=>featureName(f));
  }
  svg.setAttribute('viewBox','0 0 660 500');
