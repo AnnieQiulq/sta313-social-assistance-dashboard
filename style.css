@@ -159,3 +159,6 @@ main{max-width:1510px}.layout,.bottom-layout{grid-template-columns:minmax(0,3.05
 .map{height:clamp(390px,46vw,610px)!important;min-height:0!important}
 .map>svg#svg{width:100%!important;height:100%!important;aspect-ratio:auto!important;display:block!important}
 @media(max-width:650px){.map{height:clamp(320px,80vw,440px)!important}}
+
+/* Northern inset is only relevant at the all-Ontario scale. */
+.map.is-zoomed .northern-panel{display:none!important}
