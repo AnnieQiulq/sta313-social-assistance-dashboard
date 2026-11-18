@@ -111,3 +111,10 @@ main{max-width:1510px}.layout,.bottom-layout{grid-template-columns:minmax(0,3.05
 .combined-inset .inset-title{font-size:15px}
 .combined-inset .north-position-label{font-size:15px;stroke-width:4px}
 @media(max-width:650px){.inset.combined-inset{width:72%;min-width:0;max-width:none;padding:7px}.combined-inset .inset-title{font-size:11px}.combined-inset .north-position-label{font-size:13px}}
+
+/* Fix inset sizing: size the positioned parent, not only its child. */
+.map .insets{width:min(520px,76%);max-width:calc(100% - 24px);right:12px;bottom:12px;display:block}
+.map .insets .inset.combined-inset{display:block;width:100%;min-width:0;max-width:none;height:auto;padding:12px 14px}
+.map .insets .combined-inset #northInsetSvg{width:100%;height:auto;max-height:none;aspect-ratio:400/240;display:block}
+.map .insets .combined-inset .north-position-label{font-size:17px;stroke-width:4px}
+@media(max-width:650px){.map .insets{width:min(390px,78%);right:7px;bottom:7px}.map .insets .inset.combined-inset{padding:8px}.map .insets .combined-inset .north-position-label{font-size:15px}}
