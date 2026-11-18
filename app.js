@@ -63,18 +63,19 @@ function renderMap(){
    .attr('d',northPath).attr('fill','#edf0ee').attr('stroke','#c9d0d1')
    .attr('stroke-width',0.65).attr('vector-effect','non-scaling-stroke').style('pointer-events','none');
   north.append('g').selectAll('path').data(northFeatures,d=>d.properties.CMAUID).join('path')
-   .attr('class','north-cma').attr('d',northPath)
+   .attr('class','north-cma').attr('d',northPath).attr('transform',f=>{const p=northPath.centroid(f);return 'translate('+p[0]+','+p[1]+') scale(2.3) translate('+(-p[0])+','+(-p[1])+')'})
    .attr('fill',f=>color(change(CMA.find(c=>c[0]===featureName(f)))))
    .attr('stroke',f=>selected===featureName(f)?'#203447':'#fff')
    .attr('stroke-width',f=>selected===featureName(f)?2.6:1.5)
    .attr('vector-effect','non-scaling-stroke').style('cursor','pointer')
    .on('click',(e,f)=>select(CMA.find(c=>c[0]===featureName(f))))
-   .on('pointermove',(e,f)=>showTip(e,CMA.find(c=>c[0]===featureName(f))))
-   .on('pointerleave',()=>tip.style.display='none');
+   .on('pointerenter',(e,f)=>{north.selectAll('.north-cma').filter(d=>d===f).attr('opacity',.8)})
+   .on('pointerleave',()=>north.selectAll('.north-cma').attr('opacity',1))
+   .append('title').text(f=>featureName(f)+' — click to select');
   north.append('g').selectAll('text').data(northFeatures,d=>d.properties.CMAUID).join('text')
    .attr('class','north-position-label')
    .attr('x',f=>northPath.centroid(f)[0])
-   .attr('y',f=>northPath.centroid(f)[1]-12)
+   .attr('y',f=>northPath.centroid(f)[1]-26)
    .attr('text-anchor','middle').text(f=>featureName(f));
  }
  svg.setAttribute('viewBox','0 0 660 500');
