@@ -154,3 +154,8 @@ main{max-width:1510px}.layout,.bottom-layout{grid-template-columns:minmax(0,3.05
 .map .northern-panel .north-position-label{font-size:14px!important;stroke-width:4px!important}
 .map .tooltip{z-index:6;max-width:min(260px,calc(100% - 20px))}
 @media(max-width:650px){.map .northern-panel{right:6px!important;bottom:6px!important;width:48%!important;min-width:0!important}.map .northern-panel .north-position-label{font-size:12px!important}}
+
+/* Keep the main map compact on wide screens. */
+.map{height:clamp(390px,46vw,610px)!important;min-height:0!important}
+.map>svg#svg{width:100%!important;height:100%!important;aspect-ratio:auto!important;display:block!important}
+@media(max-width:650px){.map{height:clamp(320px,80vw,440px)!important}}
