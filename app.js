@@ -56,7 +56,7 @@ function renderMap(){
  if(northFeatures.length===2){
   const north=d3.select('#northInset');
   const featureName=f=>insetNames.find(name=>String(CODES[name])===String(f.properties.CMAUID));
-  const northProjection=d3.geoMercator().fitExtent([[35,35],[365,205]],{type:'FeatureCollection',features:northFeatures});
+  const northProjection=d3.geoMercator().fitExtent([[18,20],[382,220]],{type:'FeatureCollection',features:northFeatures});
   const northPath=d3.geoPath(northProjection);
   north.selectAll('*').remove();
   north.append('g').selectAll('path').data(CONTEXT?.features||[]).join('path')
