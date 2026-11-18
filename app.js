@@ -73,16 +73,16 @@ function renderMap(){
    .on('pointerenter',(e,f)=>{north.selectAll('.north-cma').filter(d=>d===f).attr('opacity',.8)})
    .on('pointerleave',()=>north.selectAll('.north-cma').attr('opacity',1))
    .append('title').text(f=>featureName(f)+' — click to select');
-  const waterLabels=[['Lake Superior',-87.7,47.2],['Georgian Bay',-80.6,45.5],['Lake Huron',-82.4,45.5]];
+  const waterLabels=[['Lake Superior',-87.7,47.2],['Lake Huron',-82.4,45.5]];
   north.append('g').selectAll('text').data(waterLabels).join('text')
    .attr('class','north-water-label')
-   .attr('x',d=>Math.max(65,Math.min(330,northProjection([d[1],d[2]])[0])))
-   .attr('y',d=>Math.max(24,Math.min(210,northProjection([d[1],d[2]])[1])))
+   .attr('x',d=>d[0]==='Lake Huron'?265:155)
+   .attr('y',d=>d[0]==='Lake Huron'?213:176)
    .attr('text-anchor','middle').text(d=>d[0]);
   north.append('g').selectAll('text').data(northFeatures,d=>d.properties.CMAUID).join('text')
    .attr('class','north-position-label')
-   .attr('x',f=>Math.max(68,Math.min(327,northPath.centroid(f)[0])))
-   .attr('y',f=>Math.max(24,Math.min(215,northPath.centroid(f)[1]-12)))
+   .attr('x',f=>featureName(f)==='Thunder Bay'?100:298)
+   .attr('y',f=>Math.max(30,Math.min(195,northPath.centroid(f)[1]-13)))
    .attr('text-anchor','middle').text(f=>featureName(f));
  }
  svg.setAttribute('viewBox','0 0 660 500');
