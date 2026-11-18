@@ -104,3 +104,10 @@ main{max-width:1510px}.layout,.bottom-layout{grid-template-columns:minmax(0,3.05
 .combined-inset #northInsetSvg{display:block;width:100%;height:auto;max-height:none;aspect-ratio:400/240;overflow:hidden}
 .combined-inset .north-position-label{font-size:12px;font-weight:650;fill:#25394b;stroke:#fff;stroke-width:3px;paint-order:stroke;pointer-events:none}
 @media(max-width:650px){.inset.combined-inset{width:min(290px,65%);height:auto;padding:7px}.combined-inset #northInsetSvg{height:auto}}
+
+/* Larger northern geographic inset */
+.inset.combined-inset{width:68%;max-width:600px;min-width:350px;height:auto;padding:12px 15px}
+.combined-inset #northInsetSvg{width:100%;height:auto;aspect-ratio:400/225}
+.combined-inset .inset-title{font-size:15px}
+.combined-inset .north-position-label{font-size:15px;stroke-width:4px}
+@media(max-width:650px){.inset.combined-inset{width:72%;min-width:0;max-width:none;padding:7px}.combined-inset .inset-title{font-size:11px}.combined-inset .north-position-label{font-size:13px}}
