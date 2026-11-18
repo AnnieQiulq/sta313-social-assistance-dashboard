@@ -12,7 +12,7 @@ function node(tag,attrs){let e=document.createElementNS(ns,tag);for(let [k,v] of
 function select(c){selected=c[0];render();renderBottom();document.getElementById('status').innerHTML='<strong>Selected:</strong> '+c[0]+' · Real '+startYear+' rate: '+rate(c,startYear).toFixed(1)+' · '+endYear+' rate: '+rate(c,endYear).toFixed(1)+' per 1,000 · Change: '+fmt(change(c))}
 function sparkline(c){let vals=Array.from({length:endYear-startYear+1},(_,i)=>rate(c,startYear+i));let lo=Math.min(...vals),hi=Math.max(...vals),spread=hi-lo||1;let pts=vals.map((v,i)=>[8+i*182/Math.max(1,vals.length-1),38-(v-lo)/spread*28]);return '<svg viewBox="0 0 200 50" width="200" height="50"><polyline points="'+pts.map(p=>p.join(',')).join(' ')+'" fill="none" stroke="#e9a875" stroke-width="2"/></svg>'}
 function showTip(e,c){tip.style.display='block';const r1=rate(c,startYear),r2=rate(c,endYear);tip.innerHTML='<strong>'+c[0]+'</strong><div>Rate per 1,000, '+startYear+' → '+endYear+': '+r1.toFixed(1)+' → '+r2.toFixed(1)+'</div>'+sparkline(c)+'<div>Change: '+fmt(change(c))+'</div><div>Program: '+(program==='both'?'OW + ODSP':program.toUpperCase())+'</div><small>Click to update charts</small>';let rect=document.getElementById('map').getBoundingClientRect();tip.style.left=Math.max(10,Math.min(e.clientX-rect.left+12,rect.width-245))+'px';tip.style.top=Math.max(10,Math.min(e.clientY-rect.top+12,rect.height-180))+'px'}
-let GEO=null, CONTEXT=null;
+let GEO=null, CONTEXT=null, FULL_ONTARIO=null;
 const geoByCode=new Map();
 function renderMap(){
  if(!GEO)return;
@@ -60,7 +60,7 @@ function renderMap(){
   const northProjection=d3.geoMercator().fitExtent([[18,20],[382,220]],{type:'FeatureCollection',features:northFeatures});
   const northPath=d3.geoPath(northProjection);
   north.selectAll('*').remove();
-  north.append('g').selectAll('path').data(CONTEXT?.features||[]).join('path')
+  north.append('g').selectAll('path').data(FULL_ONTARIO?.features||CONTEXT?.features||[]).join('path')
    .attr('d',northPath).attr('fill','#f0f1ec').attr('stroke','#b7c4c7')
    .attr('stroke-width',0.65).attr('vector-effect','non-scaling-stroke').style('pointer-events','none');
   north.append('g').selectAll('path').data(northFeatures,d=>d.properties.CMAUID).join('path')
@@ -76,8 +76,8 @@ function renderMap(){
   const waterLabels=[['Lake Superior',-87.7,47.2],['Lake Huron',-82.4,45.5]];
   north.append('g').selectAll('text').data(waterLabels).join('text')
    .attr('class','north-water-label')
-   .attr('x',d=>d[0]==='Lake Huron'?265:155)
-   .attr('y',d=>d[0]==='Lake Huron'?213:176)
+   .attr('x',d=>d[0]==='Lake Huron'?275:155)
+   .attr('y',d=>d[0]==='Lake Huron'?211:175)
    .attr('text-anchor','middle').text(d=>d[0]);
   north.append('g').selectAll('text').data(northFeatures,d=>d.properties.CMAUID).join('text')
    .attr('class','north-position-label')
@@ -147,5 +147,5 @@ function updateControls(){
  render();renderBottom();updateMetrics();
 }
 for(let id of ['startYear','endYear','programSelect'])document.getElementById(id).addEventListener('input',updateControls);
-Promise.all([d3.json('real_data.json'),d3.json('ontario_15_cma_boundaries.geojson'),d3.json('ontario_context.geojson')]).then(([d,g,context])=>{DATA=d;GEO=g;CONTEXT=context;for(const f of g.features)geoByCode.set(String(f.properties.CMAUID),f);render();renderBottom();updateMetrics();select(CMA.find(c=>c[0]===selected))}).catch(err=>{document.getElementById('status').textContent='Could not load data or boundaries. Use Live Server and check internet for D3. '+err.message;console.error(err)});
+Promise.all([d3.json('real_data.json'),d3.json('ontario_15_cma_boundaries.geojson'),d3.json('ontario_context.geojson'),d3.json('ontario_full_boundary.geojson')]).then(([d,g,context,fullOntario])=>{DATA=d;GEO=g;CONTEXT=context;FULL_ONTARIO=fullOntario;for(const f of g.features)geoByCode.set(String(f.properties.CMAUID),f);render();renderBottom();updateMetrics();select(CMA.find(c=>c[0]===selected))}).catch(err=>{document.getElementById('status').textContent='Could not load data or boundaries. Use Live Server and check internet for D3. '+err.message;console.error(err)});
 function updateMetrics(){const sorted=[...CMA].sort((a,b)=>change(b)-change(a));const count=sorted.filter(c=>change(c)>0).length;document.getElementById('countMetric').textContent=count+' of 15';document.getElementById('riseMetric').textContent=fmt(change(sorted[0]));document.getElementById('riseName').textContent='Largest rise: '+sorted[0][0];document.getElementById('fallMetric').textContent=fmt(change(sorted.at(-1)));document.getElementById('fallName').textContent='Largest fall: '+sorted.at(-1)[0]}
