@@ -178,3 +178,6 @@ main{max-width:1510px}.layout,.bottom-layout{grid-template-columns:minmax(0,3.05
 
 /* Refine northern locator without changing the main map projection or scale. */
 @media(min-width:651px){.map .northern-panel{width:34%!important;max-width:360px!important}}
+
+/* Taller, not wider: keep the locator in the map's lower-right corner. */
+.map .northern-panel #northInsetSvg{aspect-ratio:400/280!important;height:auto!important}
