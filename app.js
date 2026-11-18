@@ -11,85 +11,68 @@ function fmt(v){return (v>0?'+':'')+v.toFixed(1)+'%'}
 function node(tag,attrs){let e=document.createElementNS(ns,tag);for(let [k,v] of Object.entries(attrs))e.setAttribute(k,v);return e}
 function select(c){selected=c[0];render();renderBottom();document.getElementById('status').innerHTML='<strong>Selected:</strong> '+c[0]+' · Real '+startYear+' rate: '+rate(c,startYear).toFixed(1)+' · '+endYear+' rate: '+rate(c,endYear).toFixed(1)+' per 1,000 · Change: '+fmt(change(c))}
 function sparkline(c){let vals=Array.from({length:endYear-startYear+1},(_,i)=>rate(c,startYear+i));let lo=Math.min(...vals),hi=Math.max(...vals),spread=hi-lo||1;let pts=vals.map((v,i)=>[8+i*182/Math.max(1,vals.length-1),38-(v-lo)/spread*28]);return '<svg viewBox="0 0 200 50" width="200" height="50"><polyline points="'+pts.map(p=>p.join(',')).join(' ')+'" fill="none" stroke="#e9a875" stroke-width="2"/></svg>'}
-function showTip(e,c){tip.style.display='block';const r1=rate(c,startYear),r2=rate(c,endYear);tip.innerHTML='<strong>'+c[0]+'</strong><div>Rate per 1,000, '+startYear+' → '+endYear+': '+r1.toFixed(1)+' → '+r2.toFixed(1)+'</div>'+sparkline(c)+'<div>Change: '+fmt(change(c))+'</div><div>Program: '+(program==='both'?'OW + ODSP':program.toUpperCase())+'</div><small>Click to update charts</small>';let rect=document.getElementById('map').getBoundingClientRect();const insetHover=!!e.target.closest('#northInsetSvg');if(insetHover){const insetRect=document.querySelector('.northern-panel').getBoundingClientRect();tip.style.position='fixed';tip.style.left=Math.max(8,insetRect.left-285)+'px';tip.style.top=Math.max(8,Math.min(insetRect.top,window.innerHeight-tip.offsetHeight-8))+'px'}else{tip.style.position='absolute';tip.style.left=Math.max(10,Math.min(e.clientX-rect.left+12,rect.width-285))+'px';tip.style.top=Math.max(10,Math.min(e.clientY-rect.top+12,rect.height-245))+'px'}}
+function showTip(e,c){tip.style.display='block';const r1=rate(c,startYear),r2=rate(c,endYear);tip.innerHTML='<strong>'+c[0]+'</strong><div>Rate per 1,000, '+startYear+' → '+endYear+': '+r1.toFixed(1)+' → '+r2.toFixed(1)+'</div>'+sparkline(c)+'<div>Change: '+fmt(change(c))+'</div><div>Program: '+(program==='both'?'OW + ODSP':program.toUpperCase())+'</div><small>Click to update charts</small>';let rect=document.getElementById('map').getBoundingClientRect();const insetHover=false;if(insetHover){const insetRect=document.querySelector('.northern-panel').getBoundingClientRect();tip.style.position='fixed';tip.style.left=Math.max(8,insetRect.left-285)+'px';tip.style.top=Math.max(8,Math.min(insetRect.top,window.innerHeight-tip.offsetHeight-8))+'px'}else{tip.style.position='absolute';tip.style.left=Math.max(10,Math.min(e.clientX-rect.left+12,rect.width-285))+'px';tip.style.top=Math.max(10,Math.min(e.clientY-rect.top+12,rect.height-245))+'px'}}
 let GEO=null, CONTEXT=null, FULL_ONTARIO=null;
 const geoByCode=new Map();
 function renderMap(){
  if(!GEO)return;
  document.getElementById('map').classList.toggle('is-zoomed',zoom!=='all');
- const main=GEO.features.filter(f=>!insetNames.includes(CMA.find(c=>String(CODES[c[0]])===String(f.properties.CMAUID))?.[0]));
- const selection=zoom==='all'?main:main.filter(f=>['Toronto','Hamilton','Oshawa','Barrie','Guelph','Brantford','Kitchener–Cambridge–Waterloo','St. Catharines–Niagara','Peterborough'].some(name=>String(CODES[name])===String(f.properties.CMAUID)));
- // Fit the actual CMA bounds inside the viewport; no post-fit scaling that clips edges.
- const projection=d3.geoMercator().fitExtent(
-   zoom==='all'?[[28,34],[625,460]]:[[35,34],[625,462]],
-   {type:'FeatureCollection',features:selection}
- );
+ const allFeatures=GEO.features.filter(f=>CMA.some(c=>String(CODES[c[0]])===String(f.properties.CMAUID)));
+ const focusNames=['Toronto','Hamilton','Oshawa','Barrie','Guelph','Brantford','Kitchener–Cambridge–Waterloo','St. Catharines–Niagara','Peterborough'];
+ const focus=zoom==='all'?allFeatures:allFeatures.filter(f=>focusNames.some(name=>String(CODES[name])===String(f.properties.CMAUID)));
+ // Fit all fifteen CMAs in the full view: no geographic repositioning or northern inset.
+ const projection=d3.geoMercator().fitExtent([[38,35],[620,458]],{type:'FeatureCollection',features:focus});
  const path=d3.geoPath(projection);
-
- const context=d3.select('#contextLayer');
- context.selectAll('path.context-land').data((CONTEXT?.features||[]).filter(f=>String(f.properties?.PRUID)==='35')).join('path').attr('class','context-land').attr('d',path);
- const placeLabels=zoom==='all'?[['Lake Huron',-82.25,44.35,'water'],['Georgian Bay',-80.75,45.05,'water'],['Lake Ontario',-78.35,43.32,'water'],['Lake Erie',-81.15,42.55,'water'],['UNITED STATES',-82.1,41.65,'region'],['QUEBEC',-76.6,46.1,'region']]: [['Lake Ontario',-78.45,43.05,'water'],['Georgian Bay',-80.65,44.9,'water']];
- d3.select('#labels').selectAll('text.context-place').data(placeLabels,d=>d[0]).join('text').attr('class',d=>'context-place '+(d[3]==='water'?'context-water-label':'context-region-label')).attr('x',d=>Math.max(85,Math.min(575,projection([d[1],d[2]])?.[0]??-100))).attr('y',d=>Math.max(35,Math.min(460,projection([d[1],d[2]])?.[1]??-100))).attr('text-anchor','middle').text(d=>d[0]);
- const join=d3.select('#areas').selectAll('path.region').data(main,d=>d.properties.CMAUID);
- join.join(enter=>enter.append('path').attr('class','region').attr('tabindex',0).attr('role','button'),update=>update,exit=>exit.remove())
-  .attr('d',path).attr('fill',f=>color(change(CMA.find(c=>String(CODES[c[0]])===String(f.properties.CMAUID)))))
-  .attr('stroke',f=>selected===CMA.find(c=>String(CODES[c[0]])===String(f.properties.CMAUID))?.[0]?'#1f2933':'#fff')
-  .attr('stroke-width',f=>selected===CMA.find(c=>String(CODES[c[0]])===String(f.properties.CMAUID))?.[0]?3:1.2)
-  .attr('vector-effect','non-scaling-stroke')
-  .on('click',(e,f)=>select(CMA.find(c=>String(CODES[c[0]])===String(f.properties.CMAUID))))
-  .on('pointermove',(e,f)=>showTip(e,CMA.find(c=>String(CODES[c[0]])===String(f.properties.CMAUID))))
-  .on('pointerleave',()=>tip.style.display='none')
-  .on('keydown',(e,f)=>{if(e.key==='Enter'){select(CMA.find(c=>String(CODES[c[0]])===String(f.properties.CMAUID)))}});
-
- const labelOffsets={
-  'Toronto':[-20,16], 'Hamilton':[-10,32], 'Oshawa':[27,8],
-  'Barrie':[-8,-20], 'Guelph':[-37,-15], 'Brantford':[-33,28],
-  'Kitchener–Cambridge–Waterloo':[-64,3], 'St. Catharines–Niagara':[45,25],
-  'Peterborough':[26,-14], 'London':[-12,13], 'Windsor':[-8,10],
-  'Kingston':[22,-10], 'Ottawa–Gatineau (Ont. part)':[3,3]
- };
+ d3.select('#contextLayer').selectAll('path.context-land')
+  .data((CONTEXT?.features||[]).filter(f=>String(f.properties?.PRUID)==='35'))
+  .join('path').attr('class','context-land').attr('d',path);
+ // CMA boundaries are geographic context, not the colour encoding.
+ d3.select('#areas').selectAll('path.region').data(allFeatures,d=>d.properties.CMAUID)
+  .join('path').attr('class','region dot-boundary').attr('d',path)
+  .attr('fill','#e9eee9').attr('stroke','#a9b8bd').attr('stroke-width',.7)
+  .attr('vector-effect','non-scaling-stroke').style('pointer-events','none');
+ const byName=f=>CMA.find(c=>String(CODES[c[0]])===String(f.properties.CMAUID));
  const labelNames={'Ottawa–Gatineau (Ont. part)':'Ottawa–Gatineau','Kitchener–Cambridge–Waterloo':'Kitchener–C–W','St. Catharines–Niagara':'St. Catharines–N.'};
- const labelData=main.map(f=>{const c=CMA.find(c=>String(CODES[c[0]])===String(f.properties.CMAUID));if(!c)return null;const xy=path.centroid(f),off=labelOffsets[c[0]]||[0,0];return {name:c[0],text:labelNames[c[0]]||c[0],cx:xy[0],cy:xy[1],x:xy[0]+off[0],y:xy[1]+off[1]};}).filter(d=>d&&Number.isFinite(d.x)&&Number.isFinite(d.y));
- d3.select('#labels').selectAll('line.leader').data(labelData.filter(d=>Math.hypot(d.x-d.cx,d.y-d.cy)>14),d=>d.name).join('line').attr('class','leader')
- .attr('x1',d=>d.cx).attr('y1',d=>d.cy).attr('x2',d=>d.x).attr('y2',d=>d.y-3).attr('stroke','#617080').attr('stroke-width',.8).attr('opacity',.7);
- d3.select('#labels').selectAll('text.maplabel').data(labelData,d=>d.name).join('text')
- .attr('x',d=>Math.max(8,Math.min(650,d.x))).attr('y',d=>Math.max(15,Math.min(489,d.y)))
- .attr('text-anchor','middle').attr('class','maplabel').text(d=>d.text);
-
-
- const northFeatures=insetNames.map(name=>geoByCode.get(String(CODES[name]))).filter(Boolean);
- if(northFeatures.length===2){
-  const north=d3.select('#northInset');
-  const featureName=f=>insetNames.find(name=>String(CODES[name])===String(f.properties.CMAUID));
-  const northProjection=d3.geoMercator().fitExtent([[12,25],[388,260]],{type:'FeatureCollection',features:northFeatures});
-  const northPath=d3.geoPath(northProjection);
-  north.selectAll('*').remove();
-  north.append('g').selectAll('path').data(FULL_ONTARIO?.features||CONTEXT?.features||[]).join('path')
-   .attr('d',northPath).attr('fill','#f0f1ec').attr('stroke','#b7c4c7')
-   .attr('stroke-width',0.65).attr('vector-effect','non-scaling-stroke').style('pointer-events','none');
-  north.append('g').selectAll('path').data(northFeatures,d=>d.properties.CMAUID).join('path')
-   .attr('class','north-cma').attr('d',northPath)
-   .attr('fill',f=>color(change(CMA.find(c=>c[0]===featureName(f)))))
-   .attr('stroke',f=>selected===featureName(f)?'#203447':'#fff')
-   .attr('stroke-width',f=>selected===featureName(f)?2.6:1.5)
-   .attr('vector-effect','non-scaling-stroke').style('cursor','pointer')
-   .on('click',(e,f)=>select(CMA.find(c=>c[0]===featureName(f))))
-   .on('pointerenter',(e,f)=>{north.selectAll('.north-cma').filter(d=>d===f).attr('opacity',.8);showTip(e,CMA.find(c=>c[0]===featureName(f)))})
-   .on('pointermove',(e,f)=>showTip(e,CMA.find(c=>c[0]===featureName(f))))
-   .on('pointerleave',()=>{north.selectAll('.north-cma').attr('opacity',1);tip.style.display='none'})
-   .append('title').text(f=>featureName(f)+' — click to select');
-  const waterLabels=[['Lake Superior',-87.7,47.2],['Lake Huron',-82.4,45.5]];
-  north.append('g').selectAll('text').data(waterLabels).join('text')
-   .attr('class','north-water-label')
-   .attr('x',d=>d[0]==='Lake Huron'?275:155)
-   .attr('y',d=>d[0]==='Lake Huron'?252:208)
-   .attr('text-anchor','middle').text(d=>d[0]);
-  north.append('g').selectAll('text').data(northFeatures,d=>d.properties.CMAUID).join('text')
-   .attr('class','north-position-label')
-   .attr('x',f=>featureName(f)==='Thunder Bay'?100:298)
-   .attr('y',f=>Math.max(30,Math.min(245,northPath.centroid(f)[1]-13)))
-   .attr('text-anchor','middle').text(f=>featureName(f));
- }
+ const labelOffsets={
+  'Toronto':[-24,-19],'Hamilton':[-23,28],'Oshawa':[34,-12],
+  'Barrie':[12,-17],'Guelph':[-33,-20],'Brantford':[-35,30],
+  'Kitchener–Cambridge–Waterloo':[-48,-32],
+  'St. Catharines–Niagara':[42,25],'Peterborough':[35,-12],
+  'London':[-23,25],'Windsor':[-10,23],'Kingston':[28,-13],
+  'Ottawa–Gatineau (Ont. part)':[30,-16],
+  'Greater Sudbury':[25,-14],'Thunder Bay':[30,-14]
+ };
+ const dots=allFeatures.map(f=>{
+   const c=byName(f),xy=path.centroid(f);
+   if(!c||!xy.every(Number.isFinite))return null;
+   const offset=labelOffsets[c[0]]||[24,-14];
+   return {c,x:xy[0],y:xy[1],lx:xy[0]+offset[0],ly:xy[1]+offset[1],label:labelNames[c[0]]||c[0]};
+ }).filter(Boolean);
+ const labelLayer=d3.select('#labels');
+ labelLayer.selectAll('text.context-place').remove();
+ labelLayer.selectAll('line.leader').data(dots,d=>d.c[0]).join('line')
+  .attr('class','leader').attr('x1',d=>d.x).attr('y1',d=>d.y)
+  .attr('x2',d=>d.lx).attr('y2',d=>d.ly-4)
+  .attr('stroke','#82949e').attr('stroke-width',.9)
+  .attr('opacity',d=>Math.hypot(d.lx-d.x,d.ly-d.y)>19?.8:0);
+ const marks=labelLayer.selectAll('circle.cma-dot').data(dots,d=>d.c[0]);
+ marks.join('circle').attr('class','cma-dot').attr('cx',d=>d.x).attr('cy',d=>d.y)
+  .attr('r',9).attr('fill',d=>color(change(d.c)))
+  .attr('stroke',d=>selected===d.c[0]?'#182a37':'#fff')
+  .attr('stroke-width',d=>selected===d.c[0]?3.5:2)
+  .attr('tabindex',0).attr('role','button')
+  .attr('aria-label',d=>d.c[0]+': '+fmt(change(d.c))+'; select city')
+  .style('cursor','pointer')
+  .on('click',(e,d)=>select(d.c))
+  .on('pointerenter',(e,d)=>showTip(e,d.c))
+  .on('pointermove',(e,d)=>showTip(e,d.c))
+  .on('pointerleave',()=>tip.style.display='none')
+  .on('keydown',(e,d)=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();select(d.c)}});
+ labelLayer.selectAll('text.maplabel').data(dots,d=>d.c[0]).join('text')
+  .attr('class','maplabel').attr('x',d=>Math.max(12,Math.min(645,d.lx)))
+  .attr('y',d=>Math.max(18,Math.min(485,d.ly)))
+  .attr('text-anchor','middle').text(d=>d.label)
+  .style('pointer-events','none');
  svg.setAttribute('viewBox','0 0 660 500');
 }
 function render(){document.getElementById('mapPeriod').textContent=startYear+'–'+endYear;
