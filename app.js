@@ -54,36 +54,28 @@ function renderMap(){
 
  const northFeatures=insetNames.map(name=>geoByCode.get(String(CODES[name]))).filter(Boolean);
  if(northFeatures.length===2){
-   const north=d3.select('#northInset');
-   const featureName=f=>insetNames.find(name=>String(CODES[name])===String(f.properties.CMAUID));
-   const shared=d3.geoMercator().fitExtent([[26,22],[366,105]],{type:'FeatureCollection',features:northFeatures});
-   const sharedPath=d3.geoPath(shared);
-   north.selectAll('path.north-location').data(northFeatures,d=>d.properties.CMAUID).join('path')
-     .attr('class','north-location').attr('d',sharedPath).attr('fill',f=>color(change(CMA.find(c=>c[0]===featureName(f)))))
-     .attr('stroke','#fff').attr('stroke-width',1.5);
-   const locations=northFeatures.map(f=>({name:featureName(f),point:sharedPath.centroid(f)}));
-   const boxes={'Thunder Bay':{x:12,y:122,w:170,h:155},'Greater Sudbury':{x:218,y:122,w:170,h:155}};
-   north.selectAll('line.north-connector').data(locations,d=>d.name).join('line').attr('class','north-connector')
-     .attr('x1',d=>d.point[0]).attr('y1',d=>d.point[1]).attr('x2',d=>boxes[d.name].x+boxes[d.name].w/2)
-     .attr('y2',122).attr('stroke','#77899a').attr('stroke-width',1.3).attr('stroke-dasharray','3 4');
-   north.selectAll('circle.north-dot').data(locations,d=>d.name).join('circle').attr('class','north-dot')
-     .attr('cx',d=>d.point[0]).attr('cy',d=>d.point[1]).attr('r',4).attr('fill','#253445').attr('stroke','#fff').attr('stroke-width',1.5);
-   north.selectAll('text.north-position-label').data(locations,d=>d.name).join('text').attr('class','north-position-label')
-     .attr('x',d=>d.point[0]).attr('y',d=>d.point[1]-10).attr('text-anchor','middle').text(d=>d.name);
-   north.selectAll('rect.north-closeup-frame').data(insetNames,d=>d).join('rect').attr('class','north-closeup-frame')
-     .attr('x',d=>boxes[d].x).attr('y',d=>boxes[d].y).attr('width',d=>boxes[d].w).attr('height',d=>boxes[d].h)
-     .attr('rx',9).attr('fill','#fff').attr('stroke','#d8d6d0');
-   north.selectAll('path.north-cma').data(northFeatures,d=>d.properties.CMAUID).join('path')
-     .attr('class','north-cma').attr('d',f=>{const q=boxes[featureName(f)];return d3.geoPath(d3.geoMercator().fitExtent([[q.x+15,q.y+12],[q.x+q.w-15,q.y+q.h-34]],f))(f)})
-     .attr('fill',f=>color(change(CMA.find(c=>c[0]===featureName(f)))))
-     .attr('stroke',f=>selected===featureName(f)?'#1f2933':'#fff').attr('stroke-width',f=>selected===featureName(f)?2.8:1.5)
-     .attr('vector-effect','non-scaling-stroke').style('cursor','pointer')
-     .on('click',(e,f)=>select(CMA.find(c=>c[0]===featureName(f))))
-     .on('pointermove',(e,f)=>showTip(e,CMA.find(c=>c[0]===featureName(f))))
-     .on('pointerleave',()=>tip.style.display='none');
-   north.selectAll('text.north-label').data(insetNames,d=>d).join('text').attr('class','north-label')
-     .attr('x',d=>boxes[d].x+boxes[d].w/2).attr('y',d=>boxes[d].y+boxes[d].h-12)
-     .attr('text-anchor','middle').text(d=>d);
+  const north=d3.select('#northInset');
+  const featureName=f=>insetNames.find(name=>String(CODES[name])===String(f.properties.CMAUID));
+  const northProjection=d3.geoMercator().fitExtent([[35,35],[365,205]],{type:'FeatureCollection',features:northFeatures});
+  const northPath=d3.geoPath(northProjection);
+  north.selectAll('*').remove();
+  north.append('g').selectAll('path').data(CONTEXT?.features||[]).join('path')
+   .attr('d',northPath).attr('fill','#edf0ee').attr('stroke','#c9d0d1')
+   .attr('stroke-width',0.65).attr('vector-effect','non-scaling-stroke').style('pointer-events','none');
+  north.append('g').selectAll('path').data(northFeatures,d=>d.properties.CMAUID).join('path')
+   .attr('class','north-cma').attr('d',northPath)
+   .attr('fill',f=>color(change(CMA.find(c=>c[0]===featureName(f)))))
+   .attr('stroke',f=>selected===featureName(f)?'#203447':'#fff')
+   .attr('stroke-width',f=>selected===featureName(f)?2.6:1.5)
+   .attr('vector-effect','non-scaling-stroke').style('cursor','pointer')
+   .on('click',(e,f)=>select(CMA.find(c=>c[0]===featureName(f))))
+   .on('pointermove',(e,f)=>showTip(e,CMA.find(c=>c[0]===featureName(f))))
+   .on('pointerleave',()=>tip.style.display='none');
+  north.append('g').selectAll('text').data(northFeatures,d=>d.properties.CMAUID).join('text')
+   .attr('class','north-position-label')
+   .attr('x',f=>northPath.centroid(f)[0])
+   .attr('y',f=>northPath.centroid(f)[1]-12)
+   .attr('text-anchor','middle').text(f=>featureName(f));
  }
  svg.setAttribute('viewBox','0 0 660 500');
 }
