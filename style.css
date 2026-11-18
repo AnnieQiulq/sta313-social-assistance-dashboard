@@ -169,3 +169,9 @@ main{max-width:1510px}.layout,.bottom-layout{grid-template-columns:minmax(0,3.05
 .map .northern-panel .north-position-label{font-size:12px!important;stroke-width:3px!important}
 .map .northern-panel .north-water-label{font-size:12px!important}
 @media(max-width:650px){.map .northern-panel{width:38%!important;max-width:230px!important;right:5px!important;bottom:5px!important}.map .northern-panel .north-position-label{font-size:11px!important}}
+
+/* Match the SVG's actual 660x500 coordinate system. A fixed-height, wide
+   container previously letterboxed the SVG and made the map look cropped. */
+.map{height:auto!important;aspect-ratio:660/500!important;min-height:0!important}
+.map>svg#svg{width:100%!important;height:auto!important;aspect-ratio:660/500!important;display:block!important}
+@media(max-width:650px){.map{height:auto!important;aspect-ratio:660/500!important}}
