@@ -61,7 +61,7 @@ function renderMap(){
  if(northFeatures.length===2){
   const north=d3.select('#northInset');
   const featureName=f=>insetNames.find(name=>String(CODES[name])===String(f.properties.CMAUID));
-  const northProjection=d3.geoMercator().fitExtent([[18,20],[382,220]],{type:'FeatureCollection',features:northFeatures});
+  const northProjection=d3.geoMercator().fitExtent([[12,25],[388,260]],{type:'FeatureCollection',features:northFeatures});
   const northPath=d3.geoPath(northProjection);
   north.selectAll('*').remove();
   north.append('g').selectAll('path').data(FULL_ONTARIO?.features||CONTEXT?.features||[]).join('path')
@@ -74,19 +74,20 @@ function renderMap(){
    .attr('stroke-width',f=>selected===featureName(f)?2.6:1.5)
    .attr('vector-effect','non-scaling-stroke').style('cursor','pointer')
    .on('click',(e,f)=>select(CMA.find(c=>c[0]===featureName(f))))
-   .on('pointerenter',(e,f)=>{north.selectAll('.north-cma').filter(d=>d===f).attr('opacity',.8)})
-   .on('pointerleave',()=>north.selectAll('.north-cma').attr('opacity',1))
+   .on('pointerenter',(e,f)=>{north.selectAll('.north-cma').filter(d=>d===f).attr('opacity',.8);showTip(e,CMA.find(c=>c[0]===featureName(f)))})
+   .on('pointermove',(e,f)=>showTip(e,CMA.find(c=>c[0]===featureName(f))))
+   .on('pointerleave',()=>{north.selectAll('.north-cma').attr('opacity',1);tip.style.display='none'})
    .append('title').text(f=>featureName(f)+' — click to select');
   const waterLabels=[['Lake Superior',-87.7,47.2],['Lake Huron',-82.4,45.5]];
   north.append('g').selectAll('text').data(waterLabels).join('text')
    .attr('class','north-water-label')
    .attr('x',d=>d[0]==='Lake Huron'?275:155)
-   .attr('y',d=>d[0]==='Lake Huron'?211:175)
+   .attr('y',d=>d[0]==='Lake Huron'?252:208)
    .attr('text-anchor','middle').text(d=>d[0]);
   north.append('g').selectAll('text').data(northFeatures,d=>d.properties.CMAUID).join('text')
    .attr('class','north-position-label')
    .attr('x',f=>featureName(f)==='Thunder Bay'?100:298)
-   .attr('y',f=>Math.max(30,Math.min(195,northPath.centroid(f)[1]-13)))
+   .attr('y',f=>Math.max(30,Math.min(245,northPath.centroid(f)[1]-13)))
    .attr('text-anchor','middle').text(f=>featureName(f));
  }
  svg.setAttribute('viewBox','0 0 660 500');
