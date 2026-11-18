@@ -136,3 +136,12 @@ main{max-width:1510px}.layout,.bottom-layout{grid-template-columns:minmax(0,3.05
 .northern-panel .north-position-label{font-size:13px!important;stroke-width:3px!important}
 .northern-panel .north-water-label{font:italic 11px Inter,Segoe UI,Arial,sans-serif;fill:#708da0;pointer-events:none}
 @media(max-width:650px){.northern-panel #northInsetSvg{height:205px!important}.northern-panel .north-position-label{font-size:12px!important}}
+
+/* Compact, right-aligned northern inset beneath the main map */
+.northern-panel{position:relative!important;display:block!important;width:390px!important;max-width:100%!important;margin:10px 0 12px auto!important;inset:auto!important}
+.northern-panel .inset.combined-inset{width:100%!important;max-width:100%!important;min-width:0!important;height:auto!important;padding:9px 11px!important;border:1px solid #b9c8d1!important;background:#f4f7f8!important;border-radius:9px!important}
+.northern-panel #northInsetSvg{width:100%!important;height:210px!important;max-height:none!important;aspect-ratio:400/240!important;display:block!important}
+.northern-panel .inset-title{font-size:13px!important}
+.northern-panel .north-position-label{font-size:13px!important;stroke-width:3px!important}
+.northern-panel .north-water-label{font-size:11px!important}
+@media(max-width:650px){.northern-panel{width:min(390px,100%)!important}.northern-panel #northInsetSvg{height:195px!important}}
