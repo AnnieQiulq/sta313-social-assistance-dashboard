@@ -19,14 +19,11 @@ function renderMap(){
  document.getElementById('map').classList.toggle('is-zoomed',zoom!=='all');
  const main=GEO.features.filter(f=>!insetNames.includes(CMA.find(c=>String(CODES[c[0]])===String(f.properties.CMAUID))?.[0]));
  const selection=zoom==='all'?main:main.filter(f=>['Toronto','Hamilton','Oshawa','Barrie','Guelph','Brantford','Kitchener–Cambridge–Waterloo','St. Catharines–Niagara','Peterborough'].some(name=>String(CODES[name])===String(f.properties.CMAUID)));
- const projection=d3.geoMercator().fitExtent(zoom==='all'?[[12,18],[648,483]]:[[25,20],[635,480]],{type:'FeatureCollection',features:selection});
- // Give the CMA shapes more visual weight without enlarging the map panel.
- // All Ontario remains comparatively conservative to retain Windsor and Ottawa.
- const focus=zoom==='all'?[330,245]:[330,245];
- const factor=zoom==='all'?1.42:1.45;
- const [tx,ty]=projection.translate();
- projection.scale(projection.scale()*factor)
-   .translate([focus[0]+(tx-focus[0])*factor,focus[1]+(ty-focus[1])*factor]);
+ // Fit the actual CMA bounds inside the viewport; no post-fit scaling that clips edges.
+ const projection=d3.geoMercator().fitExtent(
+   zoom==='all'?[[28,34],[625,460]]:[[35,34],[625,462]],
+   {type:'FeatureCollection',features:selection}
+ );
  const path=d3.geoPath(projection);
 
  const context=d3.select('#contextLayer');
