@@ -60,10 +60,10 @@ function renderMap(){
   const northPath=d3.geoPath(northProjection);
   north.selectAll('*').remove();
   north.append('g').selectAll('path').data(CONTEXT?.features||[]).join('path')
-   .attr('d',northPath).attr('fill','#edf0ee').attr('stroke','#c9d0d1')
+   .attr('d',northPath).attr('fill','#f0f1ec').attr('stroke','#b7c4c7')
    .attr('stroke-width',0.65).attr('vector-effect','non-scaling-stroke').style('pointer-events','none');
   north.append('g').selectAll('path').data(northFeatures,d=>d.properties.CMAUID).join('path')
-   .attr('class','north-cma').attr('d',northPath).attr('transform',f=>{const p=northPath.centroid(f);return 'translate('+p[0]+','+p[1]+') scale(2.3) translate('+(-p[0])+','+(-p[1])+')'})
+   .attr('class','north-cma').attr('d',northPath)
    .attr('fill',f=>color(change(CMA.find(c=>c[0]===featureName(f)))))
    .attr('stroke',f=>selected===featureName(f)?'#203447':'#fff')
    .attr('stroke-width',f=>selected===featureName(f)?2.6:1.5)
@@ -72,10 +72,16 @@ function renderMap(){
    .on('pointerenter',(e,f)=>{north.selectAll('.north-cma').filter(d=>d===f).attr('opacity',.8)})
    .on('pointerleave',()=>north.selectAll('.north-cma').attr('opacity',1))
    .append('title').text(f=>featureName(f)+' — click to select');
+  const waterLabels=[['Lake Superior',-87.7,47.2],['Georgian Bay',-80.6,45.5],['Lake Huron',-82.4,45.5]];
+  north.append('g').selectAll('text').data(waterLabels).join('text')
+   .attr('class','north-water-label')
+   .attr('x',d=>northProjection([d[1],d[2]])[0])
+   .attr('y',d=>northProjection([d[1],d[2]])[1])
+   .attr('text-anchor','middle').text(d=>d[0]);
   north.append('g').selectAll('text').data(northFeatures,d=>d.properties.CMAUID).join('text')
    .attr('class','north-position-label')
    .attr('x',f=>northPath.centroid(f)[0])
-   .attr('y',f=>northPath.centroid(f)[1]-26)
+   .attr('y',f=>northPath.centroid(f)[1]-12)
    .attr('text-anchor','middle').text(f=>featureName(f));
  }
  svg.setAttribute('viewBox','0 0 660 500');
