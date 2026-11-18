@@ -23,7 +23,7 @@ function renderMap(){
  // Give the CMA shapes more visual weight without enlarging the map panel.
  // All Ontario remains comparatively conservative to retain Windsor and Ottawa.
  const focus=zoom==='all'?[330,245]:[330,245];
- const factor=zoom==='all'?1.11:1.22;
+ const factor=zoom==='all'?1.27:1.34;
  const [tx,ty]=projection.translate();
  projection.scale(projection.scale()*factor)
    .translate([focus[0]+(tx-focus[0])*factor,focus[1]+(ty-focus[1])*factor]);
