@@ -162,3 +162,10 @@ main{max-width:1510px}.layout,.bottom-layout{grid-template-columns:minmax(0,3.05
 
 /* Northern inset is only relevant at the all-Ontario scale. */
 .map.is-zoomed .northern-panel{display:none!important}
+
+/* Compact inset: leave the main map unobstructed. */
+.map .northern-panel{width:29%!important;max-width:305px!important;min-width:0!important;right:10px!important;bottom:10px!important}
+.map .northern-panel .inset.combined-inset{padding:6px 8px!important}
+.map .northern-panel .north-position-label{font-size:12px!important;stroke-width:3px!important}
+.map .northern-panel .north-water-label{font-size:12px!important}
+@media(max-width:650px){.map .northern-panel{width:38%!important;max-width:230px!important;right:5px!important;bottom:5px!important}.map .northern-panel .north-position-label{font-size:11px!important}}
