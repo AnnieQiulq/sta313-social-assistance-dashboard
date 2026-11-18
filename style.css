@@ -175,3 +175,6 @@ main{max-width:1510px}.layout,.bottom-layout{grid-template-columns:minmax(0,3.05
 .map{height:auto!important;aspect-ratio:660/500!important;min-height:0!important}
 .map>svg#svg{width:100%!important;height:auto!important;aspect-ratio:660/500!important;display:block!important}
 @media(max-width:650px){.map{height:auto!important;aspect-ratio:660/500!important}}
+
+/* Refine northern locator without changing the main map projection or scale. */
+@media(min-width:651px){.map .northern-panel{width:34%!important;max-width:360px!important}}
