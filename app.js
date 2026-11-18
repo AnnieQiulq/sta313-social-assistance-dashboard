@@ -57,7 +57,7 @@ function renderMap(){
   .attr('opacity',d=>Math.hypot(d.lx-d.x,d.ly-d.y)>19?.8:0);
  const marks=labelLayer.selectAll('circle.cma-dot').data(dots,d=>d.c[0]);
  marks.join('circle').attr('class','cma-dot').attr('cx',d=>d.x).attr('cy',d=>d.y)
-  .attr('r',9).attr('fill',d=>color(change(d.c)))
+  .attr('r',11.7).attr('fill',d=>color(change(d.c)))
   .attr('stroke',d=>selected===d.c[0]?'#182a37':'#fff')
   .attr('stroke-width',d=>selected===d.c[0]?3.5:2)
   .attr('tabindex',0).attr('role','button')
