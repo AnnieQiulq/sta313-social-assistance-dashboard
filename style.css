@@ -145,3 +145,12 @@ main{max-width:1510px}.layout,.bottom-layout{grid-template-columns:minmax(0,3.05
 .northern-panel .north-position-label{font-size:13px!important;stroke-width:3px!important}
 .northern-panel .north-water-label{font-size:11px!important}
 @media(max-width:650px){.northern-panel{width:min(390px,100%)!important}.northern-panel #northInsetSvg{height:195px!important}}
+
+/* Northern inset inside the main map, anchored to empty lower-right water */
+.map .northern-panel{position:absolute!important;right:12px!important;bottom:12px!important;left:auto!important;top:auto!important;width:37%!important;max-width:390px!important;min-width:250px!important;margin:0!important;z-index:3}
+.map .northern-panel .inset.combined-inset{width:100%!important;min-width:0!important;max-width:none!important;height:auto!important;padding:7px 9px!important;background:#f6f7f4!important;border:1px solid #a9b9c4!important;box-shadow:0 2px 10px #213b4a18!important}
+.map .northern-panel #northInsetSvg{width:100%!important;height:auto!important;max-height:none!important;aspect-ratio:400/240!important;display:block!important}
+.map .northern-panel .inset-title{font-size:12px!important}
+.map .northern-panel .north-position-label{font-size:14px!important;stroke-width:4px!important}
+.map .tooltip{z-index:6;max-width:min(260px,calc(100% - 20px))}
+@media(max-width:650px){.map .northern-panel{right:6px!important;bottom:6px!important;width:48%!important;min-width:0!important}.map .northern-panel .north-position-label{font-size:12px!important}}
