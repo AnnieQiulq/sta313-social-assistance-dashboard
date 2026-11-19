@@ -239,3 +239,23 @@ h2 { font-size:18px; }
  .overview-mode .thunder-inset svg{height:58px}
 }
 @media(max-width:1049px){.thunder-inset{width:140px}.thunder-inset svg{height:72px}}
+
+/* Cartographic reference: geographic polygons and a southeast northern locator. */
+.thunder-inset{left:auto!important;top:auto!important;right:10px!important;bottom:10px!important;width:190px!important;background:#fafaf9f5}
+.thunder-title{font-size:11px!important}
+.thunder-inset svg{height:100px!important}
+.map .cma-area{transition:stroke-width .12s ease,filter .12s ease}
+.map .cma-area:hover{filter:brightness(1.06);stroke:#243343;stroke-width:2}
+.map .maplabel{font-size:12px;paint-order:stroke;stroke:#fff;stroke-width:3px;stroke-linejoin:round}
+#thunderSvg .inset-label{font-size:9px;fill:#263443;stroke:#fff;stroke-width:2.5px;paint-order:stroke;font-weight:700}
+@media(min-width:1050px){
+ .overview-mode .map{height:clamp(260px,35vh,340px)!important}
+ .overview-mode .thunder-inset{width:135px!important;right:6px!important;bottom:6px!important;padding:4px 6px!important}
+ .overview-mode .thunder-inset svg{height:62px!important}
+ .overview-mode .thunder-title{font-size:10px!important}
+ .overview-mode .map .maplabel{font-size:12px}
+}
+@media(max-width:1049px){
+ .thunder-inset{width:145px!important}
+ .thunder-inset svg{height:70px!important}
+}
