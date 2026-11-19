@@ -32,20 +32,12 @@ function renderMap(){
   .data((CONTEXT?.features||[]).filter(f=>String(f.properties?.PRUID)==='35'))
   .join('path').attr('class','context-land').attr('d',path);
  const areas=d3.select('#areas');
+ // Geographic outlines remain a neutral background: values are encoded ONLY by dots.
  areas.selectAll('path.region').data(features,d=>code(d)).join('path')
-  .attr('class','region cma-area').attr('d',path)
-  .attr('fill',f=>color(change(name(f))))
-  .attr('stroke',f=>selected===name(f)[0]?'#1f2937':'#fff')
-  .attr('stroke-width',f=>selected===name(f)[0]?2.8:1.2)
-  .attr('vector-effect','non-scaling-stroke')
-  .attr('tabindex',0).attr('role','button')
-  .attr('aria-label',f=>name(f)[0]+': '+fmt(change(name(f)))+'; select CMA')
-  .style('cursor','pointer')
-  .on('click',(e,f)=>select(name(f)))
-  .on('pointerenter',(e,f)=>showTip(e,name(f)))
-  .on('pointermove',(e,f)=>showTip(e,name(f)))
-  .on('pointerleave',()=>tip.style.display='none')
-  .on('keydown',(e,f)=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();select(name(f))}});
+  .attr('class','region dot-boundary').attr('d',path)
+  .attr('fill','#f5f4ef').attr('stroke','#b7c5cb')
+  .attr('stroke-width',.8).attr('vector-effect','non-scaling-stroke')
+  .style('pointer-events','none');
  const short={'Ottawa–Gatineau (Ont. part)':'Ottawa–Gatineau','Kitchener–Cambridge–Waterloo':'Kitchener–C–W','St. Catharines–Niagara':'St. Catharines–N.'};
  const offsets={'Toronto':[-12,0],'Hamilton':[-12,16],'Oshawa':[29,9],'Barrie':[2,-14],
  'Guelph':[-30,-17],'Brantford':[-20,19],'Kitchener–Cambridge–Waterloo':[-30,-17],
@@ -67,7 +59,20 @@ function renderMap(){
  if(!any)break;
  }
  const layer=d3.select('#labels');
- layer.selectAll('circle.cma-dot').remove();
+ const marks=layer.selectAll('circle.cma-dot').data(labels,d=>d.c[0]);
+ marks.join('circle').attr('class','cma-dot')
+  .attr('cx',d=>d.x).attr('cy',d=>d.y).attr('r',11)
+  .attr('fill',d=>color(change(d.c)))
+  .attr('stroke',d=>selected===d.c[0]?'#1f2937':'#fff')
+  .attr('stroke-width',d=>selected===d.c[0]?3.5:2)
+  .attr('tabindex',0).attr('role','button')
+  .attr('aria-label',d=>d.c[0]+': '+fmt(change(d.c))+'; select CMA')
+  .style('cursor','pointer')
+  .on('click',(e,d)=>select(d.c))
+  .on('pointerenter',(e,d)=>showTip(e,d.c))
+  .on('pointermove',(e,d)=>showTip(e,d.c))
+  .on('pointerleave',()=>tip.style.display='none')
+  .on('keydown',(e,d)=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();select(d.c)}});
  layer.selectAll('line.leader').data(labels,d=>d.c[0]).join('line').attr('class','leader')
  .attr('x1',d=>d.x).attr('y1',d=>d.y).attr('x2',d=>d.lx).attr('y2',d=>d.ly-4)
  .attr('stroke','#6e8392').attr('stroke-width',.8)
@@ -87,9 +92,14 @@ function renderThunderInset(){
  const projection=d3.geoMercator().fitExtent([[12,17],[148,96]],{type:'FeatureCollection',features}),path=d3.geoPath(projection);
  const c=f=>CMA.find(x=>String(CODES[x[0]])===String(f.properties.CMAUID));
  layer.selectAll('path').data(features,f=>f.properties.CMAUID).join('path')
- .attr('d',path).attr('fill',f=>color(change(c(f))))
+ .attr('d',path).attr('fill','#e9eee9').attr('stroke','#8ba1ac')
+ .attr('stroke-width',1).style('pointer-events','none');
+ layer.selectAll('circle.inset-dot').data(features,f=>f.properties.CMAUID).join('circle')
+ .attr('class','inset-dot')
+ .attr('cx',f=>path.centroid(f)[0]).attr('cy',f=>path.centroid(f)[1])
+ .attr('r',8).attr('fill',f=>color(change(c(f))))
  .attr('stroke',f=>selected===c(f)[0]?'#1f2937':'#fff')
- .attr('stroke-width',f=>selected===c(f)[0]?2.6:1.2)
+ .attr('stroke-width',f=>selected===c(f)[0]?3:1.5)
  .style('cursor','pointer').attr('tabindex',0).attr('role','button')
  .on('click',(e,f)=>select(c(f))).on('pointerenter',(e,f)=>showTip(e,c(f)))
  .on('pointermove',(e,f)=>showTip(e,c(f))).on('pointerleave',()=>tip.style.display='none')
