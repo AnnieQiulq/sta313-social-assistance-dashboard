@@ -15,13 +15,13 @@ The map's dot size is constant; dot colour encodes percentage change in the sele
 ## Data and reproducibility
 The dashboard loads `real_data.json`, which contains **315 CMA-year observations** (15 CMAs × 21 years). `scripts/build_data.py` reproduces it from three source CSVs:
 
-- `data/raw/ow_cma.csv`: quarterly Ontario Works CMA caseload characteristics, Ontario Ministry of Children, Community and Social Services.
-- `data/raw/odsp_cma.csv`: quarterly ODSP CMA caseload characteristics, same ministry.
-- `data/raw/cma_population_2005_2025.csv`: annual Statistics Canada CMA population, 2021 CMA geography, all ages and total gender.
+- `ont-sa-characteristic-ow-cma.csv`: quarterly Ontario Works CMA caseload characteristics, Ontario Ministry of Children, Community and Social Services.
+- `ont-sa-characteristic-odsp-cma.csv`: quarterly ODSP CMA caseload characteristics, same ministry.
+- `2005-2025-cma-population.csv`: annual Statistics Canada CMA population, 2021 CMA geography, all ages and total gender.
 
-**Important:** The original CSVs are required inputs and must be added under `data/raw/` for an independent rebuild. They are not bundled in this GitHub repository yet; see the separately supplied reproducibility archive. Do not treat the script alone as a complete reproducibility package.
+**Reproducibility:** All three original source CSVs are committed in the repository root. The script reads them directly, so no file moves or renames are required.
 
-With all three files in place, run:
+To rebuild the dashboard dataset from the committed source CSVs, run:
 
 ```bash
 python scripts/build_data.py
