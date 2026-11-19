@@ -112,24 +112,27 @@ function renderThunderInset(){
  if(zoom!=='all')return;
  const names=['Thunder Bay','Greater Sudbury'];
  const features=GEO.features.filter(f=>names.some(n=>String(CODES[n])===String(f.properties.CMAUID)));
- // A fixed geographic viewport shows the surrounding provincial coastline
- // and Great Lakes, rather than fitting only the two small CMA polygons.
- const viewport={type:'Polygon',coordinates:[[[-91.8,45.0],[-78.0,45.0],[-78.0,50.5],[-91.8,50.5],[-91.8,45.0]]]};
- const projection=d3.geoMercator().fitExtent([[8,20],[152,105]],viewport),path=d3.geoPath(projection);
  const c=f=>CMA.find(x=>String(CODES[x[0]])===String(f.properties.CMAUID));
+ // Fit an actual pair of geographic coordinates, NOT a polygon whose
+ // spherical winding can accidentally select the rest of the globe.
+ const viewport={type:'MultiPoint',coordinates:[[-91.5,49.7],[-79.0,45.2]]};
+ const projection=d3.geoMercator().fitExtent([[8,13],[152,101]],viewport);
+ const path=d3.geoPath(projection);
  const ontario=(CONTEXT?.features||[]).find(f=>String(f.properties?.PRUID)==='35');
  layer.selectAll('path.inset-context').data(ontario?[ontario]:[]).join('path')
-  .attr('class','inset-context').attr('d',path).attr('fill','#f5f4ef')
-  .attr('stroke','#aebfc8').attr('stroke-width',.8).style('pointer-events','none');
+  .attr('class','inset-context').attr('d',path).attr('fill','#f6f5f0')
+  .attr('stroke','#aebfc8').attr('stroke-width',.75).style('pointer-events','none');
  layer.selectAll('path.inset-region').data(features,f=>f.properties.CMAUID).join('path')
-  .attr('class','inset-region').attr('d',path).attr('fill','#e8eeea')
-  .attr('stroke','#8197a4').attr('stroke-width',.9).style('pointer-events','none');
+  .attr('class','inset-region').attr('d',path).attr('fill','#e6e9e5')
+  .attr('stroke','#8ca3b0').attr('stroke-width',.8).style('pointer-events','none');
  const sites=features.map(f=>({f,xy:path.centroid(f),name:c(f)[0]}));
+ // Labels use separate fixed locations so neither overlaps the other dot.
+ const placements={'Thunder Bay':{x:14,y:27,anchor:'start'},
+  'Greater Sudbury':{x:151,y:95,anchor:'end'}};
  layer.selectAll('line.inset-leader').data(sites,d=>d.name).join('line')
   .attr('class','inset-leader').attr('x1',d=>d.xy[0]).attr('y1',d=>d.xy[1])
-  .attr('x2',d=>d.name==='Thunder Bay'?d.xy[0]+17:d.xy[0]-12)
-  .attr('y2',d=>d.name==='Thunder Bay'?d.xy[1]-10:d.xy[1]-11)
-  .attr('stroke','#718b99').attr('stroke-width',.7);
+  .attr('x2',d=>placements[d.name].x).attr('y2',d=>placements[d.name].y-4)
+  .attr('stroke','#6c8391').attr('stroke-width',.8);
  layer.selectAll('circle.inset-dot').data(sites,d=>d.name).join('circle')
   .attr('class','inset-dot').attr('cx',d=>d.xy[0]).attr('cy',d=>d.xy[1])
   .attr('r',10.5).attr('fill',d=>color(change(c(d.f))))
@@ -140,14 +143,13 @@ function renderThunderInset(){
   .on('click',(e,d)=>select(c(d.f))).on('pointerenter',(e,d)=>showTip(e,c(d.f)))
   .on('pointermove',(e,d)=>showTip(e,c(d.f))).on('pointerleave',()=>tip.style.display='none')
   .on('keydown',(e,d)=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();select(c(d.f))}});
- const placeLabels=sites.map(d=>({text:d.name==='Thunder Bay'?'Thunder Bay':'Greater Sudbury',
-  x:d.name==='Thunder Bay'?d.xy[0]+19:d.xy[0]-14,y:d.xy[1]-12,
-  anchor:d.name==='Thunder Bay'?'start':'end'}));
- layer.selectAll('text.inset-label').data(placeLabels,d=>d.text).join('text')
-  .attr('class','inset-label').attr('x',d=>d.x).attr('y',d=>d.y)
-  .attr('text-anchor',d=>d.anchor).text(d=>d.text).style('pointer-events','none');
+ layer.selectAll('text.inset-label').data(sites,d=>d.name).join('text')
+  .attr('class','inset-label').attr('x',d=>placements[d.name].x)
+  .attr('y',d=>placements[d.name].y)
+  .attr('text-anchor',d=>placements[d.name].anchor)
+  .text(d=>d.name).style('pointer-events','none');
  const contextLabels=[{text:'Lake Superior',lon:-87.8,lat:47.1},
-  {text:'Lake Huron',lon:-82.6,lat:45.7},{text:'ONTARIO',lon:-85.2,lat:49.0}];
+  {text:'Lake Huron',lon:-82.3,lat:45.5},{text:'Ontario',lon:-85.0,lat:49.0}];
  layer.selectAll('text.inset-context-label').data(contextLabels,d=>d.text).join('text')
   .attr('class','inset-context-label').attr('x',d=>projection([d.lon,d.lat])[0])
   .attr('y',d=>projection([d.lon,d.lat])[1]).attr('text-anchor','middle')
