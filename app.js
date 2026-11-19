@@ -162,7 +162,7 @@ function renderThunderInset(){
   .attr('y',d=>placements[d.name].y)
   .attr('text-anchor',d=>placements[d.name].anchor)
   .text(d=>d.name).style('pointer-events','none');
- const contextLabels=[{text:'Lake Superior',x:47,y:72}, {text:'Lake Huron',x:91,y:99}];
+ const contextLabels=[{text:'Lake Superior',x:48,y:72}];
  layer.selectAll('text.inset-context-label').data(contextLabels,d=>d.text).join('text')
   .attr('class','inset-context-label').attr('x',d=>d.x)
   .attr('y',d=>d.y).attr('text-anchor','middle')
