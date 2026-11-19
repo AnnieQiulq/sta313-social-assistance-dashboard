@@ -5,8 +5,10 @@
 An interactive policy-oriented visualization of Ontario Works (OW) and Ontario Disability Support Program (ODSP) caseload rates across 15 Ontario census metropolitan areas (CMAs), 2005–2025.
 
 ## How to explore
+The **Focus** view provides a larger map for examining one CMA; **Overview** compresses the coordinated charts so analysts can compare places and change periods with less scrolling. These display modes use the same data and selections.
+
 1. Select the **start and end years** and choose **OW**, **ODSP**, or **OW + ODSP**.
-2. Compare percentage changes in the **CMA map** and **ranked bar chart**. Click a CMA dot or ranking row to select it.
+2. Compare percentage changes in the **CMA map** and **ranked bar chart**. Click a CMA dot or ranking row to select it; the policy readout updates with the selected CMA's rate change and comparative rank.
 3. Read the selected CMA's **2005–2025 historical trend** (the complete timeline remains visible when the period changes).
 4. Use **Household type**, **Age**, and **Time on assistance** to investigate which groups contributed to changes in annual-average case counts.
 
