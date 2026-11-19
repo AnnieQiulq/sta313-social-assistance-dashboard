@@ -40,7 +40,7 @@ def population():
         dguid = row["DGUID"]
         if not dguid or not (dguid.startswith("2021S0503") or dguid == "2021S050535505"):
             continue
-        code, year = int(dguid[-3:]), int(row["REF_DATE"])
+        code, year = (505 if dguid == "2021S050535505" else int(dguid[-3:])), int(row["REF_DATE"])
         if code == 505 and "Ontario part" not in row["GEO"]:
             continue
         if code in CODES and year in YEARS and row["Gender"] == "Total - gender" and row["Age group"] == "All ages":
