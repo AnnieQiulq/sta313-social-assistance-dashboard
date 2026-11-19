@@ -6,7 +6,7 @@ const CODES={'Toronto':535,'Hamilton':537,'Ottawa–Gatineau (Ont. part)':505,'K
 function rec(c,year){return DATA[CODES[c[0]]+'-'+year]}
 function rate(c,year,prog=program){let d=rec(c,year);if(!d)return NaN;let cases=prog==='both'?d.ow.cases+d.odsp.cases:d[prog].cases;return 1000*cases/d.population}
 function change(c){const a=rate(c,startYear),b=rate(c,endYear);return a?100*(b-a)/a:NaN}
-function color(v){return v>=15?'#b4451f':v>=5?'#e39a72':v>-5?'#d9d6cf':v>-15?'#8fb0d3':'#2f5f93'}
+function color(v){return v>=15?'#2f5f93':v>=5?'#8fb0d3':v>-5?'#d9d6cf':v>-15?'#e39a72':'#b4451f'}
 function fmt(v){return (v>0?'+':'')+v.toFixed(1)+'%'}
 function node(tag,attrs){let e=document.createElementNS(ns,tag);for(let [k,v] of Object.entries(attrs))e.setAttribute(k,v);return e}
 function select(c){selected=c[0];render();renderBottom();document.getElementById('status').innerHTML='<strong>Selected:</strong> '+c[0]+' · Real '+startYear+' rate: '+rate(c,startYear).toFixed(1)+' · '+endYear+' rate: '+rate(c,endYear).toFixed(1)+' per 1,000 · Change: '+fmt(change(c))}
@@ -106,7 +106,7 @@ function renderBottom(){
  else if(demographicMode==='duration')fields=program==='odsp'?[['0–35 months','moa035'],['36–59 months','moa3659'],['60+ months','moa60']]:[['0–4 months','moa04'],['5–12 months','moa512'],['13–18 months','moa1318'],['19+ months','moa19']];
  const totalA=program==='both'?a.ow.cases+a.odsp.cases:a[program].cases;
  const get=(d,k)=>program==='both'?d.ow[k]+d.odsp[k]:d[program][k];
- document.getElementById('demogCaption').textContent=c[0]+' · '+startYear+' → '+endYear+' · '+(program==='both'?'OW + ODSP':program.toUpperCase())+' · contribution to change in cases (% of starting cases)';
+ document.getElementById('demogCaption').textContent=c[0]+' · '+startYear+' → '+endYear+' · '+(program==='both'?'OW + ODSP':program.toUpperCase())+' · contributions to change in annual-average cases (% of starting cases)';
  const barsFor=(which,rows)=>{
    const denom=which==='both'?a.ow.cases+a.odsp.cases:a[which].cases;
    return rows.map(([name,k])=>{let va=which==='both'?a.ow[k]+a.odsp[k]:a[which][k],vb=which==='both'?b.ow[k]+b.odsp[k]:b[which][k];
@@ -115,7 +115,7 @@ function renderBottom(){
  };
  let html='';
  if(demographicMode==='duration'&&program==='both'){
-   html='<p class="note">OW and ODSP use different duration categories, so they are displayed separately. The Program selection remains OW + ODSP.</p>';
+   html='<p class="note">OW and ODSP have different duration categories. Each panel uses its own program’s starting caseload as the denominator; values across the two panels should not be added.</p>';
    html+='<h3 class="demog-subhead">Ontario Works</h3>'+barsFor('ow',[['0–4 months','moa04'],['5–12 months','moa512'],['13–18 months','moa1318'],['19+ months','moa19']]);
    html+='<h3 class="demog-subhead">ODSP</h3>'+barsFor('odsp',[['0–35 months','moa035'],['36–59 months','moa3659'],['60+ months','moa60']]);
  } else html=barsFor(program,fields);
@@ -125,7 +125,7 @@ function renderBottom(){
 for(let [id,mode] of [['householdBtn','household'],['ageBtn','age'],['durationBtn','duration']])document.getElementById(id).onclick=()=>{demographicMode=mode;renderBottom()};
 function updateControls(){
  let a=+document.getElementById('startYear').value,b=+document.getElementById('endYear').value;
- if(a>=b){if(document.activeElement.id==='startYear')a=b-1;else b=a+1}
+ if(a>=b){if(document.activeElement.id==='startYear')a=Math.max(2005,b-1);else b=Math.min(2025,a+1)}
  startYear=a;endYear=b;
  document.getElementById('startYear').value=a;document.getElementById('endYear').value=b;
  document.getElementById('periodLabel').textContent=a+' → '+b;
@@ -136,4 +136,4 @@ function updateControls(){
 }
 for(let id of ['startYear','endYear','programSelect'])document.getElementById(id).addEventListener('input',updateControls);
 Promise.all([d3.json('real_data.json'),d3.json('ontario_15_cma_boundaries.geojson'),d3.json('ontario_context.geojson'),d3.json('ontario_full_boundary.geojson')]).then(([d,g,context,fullOntario])=>{DATA=d;GEO=g;CONTEXT=context;FULL_ONTARIO=fullOntario;for(const f of g.features)geoByCode.set(String(f.properties.CMAUID),f);render();renderBottom();updateMetrics();select(CMA.find(c=>c[0]===selected))}).catch(err=>{document.getElementById('status').textContent='Could not load data or boundaries. Use Live Server and check internet for D3. '+err.message;console.error(err)});
-function updateMetrics(){const sorted=[...CMA].sort((a,b)=>change(b)-change(a));const count=sorted.filter(c=>change(c)>0).length;document.getElementById('countMetric').textContent=count+' of 15';document.getElementById('riseMetric').textContent=fmt(change(sorted[0]));document.getElementById('riseName').textContent='Largest rise: '+sorted[0][0];document.getElementById('fallMetric').textContent=fmt(change(sorted.at(-1)));document.getElementById('fallName').textContent='Largest fall: '+sorted.at(-1)[0]}
+function updateMetrics(){const sorted=[...CMA].sort((a,b)=>change(b)-change(a));const count=sorted.filter(c=>change(c)>0).length;document.getElementById('countMetric').textContent=count+' of 15';document.getElementById('riseMetric').textContent=fmt(change(sorted[0]));document.getElementById('riseName').textContent='Largest increase: '+sorted[0][0];document.getElementById('fallMetric').textContent=fmt(change(sorted.at(-1)));document.getElementById('fallName').textContent='Largest decrease: '+sorted.at(-1)[0]}
