@@ -169,3 +169,40 @@ h2 { font-size:18px; }
 @media(min-width:1050px) and (min-height:950px){
  .overview-mode main{zoom:.75}
 }
+
+/* 2026-11-19 correction: overview is height-limited, NOT browser-zoomed.
+   Preserve readable type and compact the disproportionately tall map instead. */
+@media(min-width:1050px){
+ body.overview-mode{padding:12px 20px 16px;overflow-x:visible}
+ .overview-mode main{zoom:1!important;max-width:1640px!important;width:auto!important}
+ .overview-mode h1{font-size:26px}
+ .overview-mode header p{font-size:13px}
+ .overview-mode header{margin-bottom:9px;gap:9px}
+ .overview-mode .topcontrols{grid-template-columns:minmax(280px,1.35fr) minmax(180px,.75fr) minmax(240px,1fr)}
+ .overview-mode .metrics{margin:9px 0;gap:11px}
+ .overview-mode .metric{min-height:76px;padding:10px 14px}
+ .overview-mode .metric b{font-size:24px}
+ .overview-mode .metric small{font-size:12px}
+ .overview-mode .metric-instruction{font-size:12px;gap:3px}
+ .overview-mode .instruction-heading{font-size:11px}
+ .overview-mode .layout,.overview-mode .bottom-layout{grid-template-columns:minmax(0,1.9fr) minmax(365px,1fr);gap:12px}
+ .overview-mode .card{padding:13px 17px}
+ .overview-mode h2{font-size:17px}
+ .overview-mode .map{height:clamp(245px,32vh,330px)!important;aspect-ratio:auto!important;overflow:hidden}
+ .overview-mode .map>svg#svg{height:100%!important;width:100%!important;aspect-ratio:auto!important;transform:none!important;display:block!important}
+ .overview-mode .maptoolbar p,.overview-mode .mapmetadata{font-size:11px}
+ .overview-mode .rank{min-height:23px;padding:3px 7px}
+ .overview-mode .rank .name,.overview-mode .rank .num{font-size:11.5px}
+ .overview-mode .legend{font-size:11px;margin-top:6px}
+ .overview-mode .note{font-size:11px;margin-top:5px}
+ .overview-mode .readout-title{font-size:15px}
+ .overview-mode .policy-readout p{font-size:11px;line-height:1.45}
+ .overview-mode .bottom-layout{margin-top:10px}
+ .overview-mode #trendChart{max-height:230px}
+ .overview-mode .chartlegend{font-size:11px}
+ .overview-mode .tabs .pill{font-size:11.5px;padding:7px 9px}
+ .overview-mode .demogtop{font-size:12px}
+ .overview-mode .demogrow{margin:9px 0}
+ .overview-mode .methodology{display:block}
+ .overview-mode .status{display:block}
+}
