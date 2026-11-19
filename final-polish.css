@@ -259,3 +259,18 @@ h2 { font-size:18px; }
  .thunder-inset{width:145px!important}
  .thunder-inset svg{height:70px!important}
 }
+
+/* Northern inset needs geographic context, not two isolated dots. */
+.thunder-inset{width:265px!important;padding:8px 10px!important}
+.thunder-inset svg{height:170px!important;background:#dce8ed;border-radius:5px}
+#thunderSvg .inset-label{font-size:10px!important;font-weight:750;paint-order:stroke;stroke:#fff;stroke-width:3px}
+#thunderSvg .inset-context-label{font-size:9px;font-style:italic;fill:#637f91;letter-spacing:.15px;paint-order:stroke;stroke:#edf4f6;stroke-width:2px}
+@media(min-width:1050px){
+ .overview-mode .thunder-inset{width:195px!important;padding:5px 7px!important}
+ .overview-mode .thunder-inset svg{height:112px!important}
+ .overview-mode #thunderSvg .inset-label{font-size:10px!important}
+}
+@media(max-width:1049px){
+ .thunder-inset{width:200px!important}
+ .thunder-inset svg{height:125px!important}
+}
