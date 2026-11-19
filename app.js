@@ -53,8 +53,8 @@ function renderMap(){
   .attr('stroke-width',.8).attr('vector-effect','non-scaling-stroke')
   .style('pointer-events','none');
  const short={'Ottawa–Gatineau (Ont. part)':'Ottawa–Gatineau','Kitchener–Cambridge–Waterloo':'Kitchener–C–W','St. Catharines–Niagara':'St. Catharines–N.'};
- const offsets={'Toronto':[-12,0],'Hamilton':[-12,16],'Oshawa':[29,9],'Barrie':[2,-14],
- 'Guelph':[-30,-17],'Brantford':[-20,19],'Kitchener–Cambridge–Waterloo':[-30,-17],
+ const offsets={'Toronto':[-12,0],'Hamilton':[36,-19],'Oshawa':[29,9],'Barrie':[2,-14],
+ 'Guelph':[-30,-17],'Brantford':[-42,24],'Kitchener–Cambridge–Waterloo':[-30,-17],
  'St. Catharines–Niagara':[38,18],'Peterborough':[35,-13],'London':[-23,16],
  'Windsor':[-18,20],'Kingston':[32,-14],'Ottawa–Gatineau (Ont. part)':[0,-19]};
  const labels=features.map(f=>{let c=name(f),xy=path.centroid(f),o=offsets[c[0]]||[0,-13];
