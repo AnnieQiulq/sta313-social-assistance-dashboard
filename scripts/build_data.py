@@ -2,7 +2,7 @@
 
 Usage: python scripts/build_data.py
 Python 3.9+; standard library only.
-Required inputs: data/raw/ow_cma.csv, odsp_cma.csv, cma_population_2005_2025.csv.
+Required inputs: ont-sa-characteristic-ow-cma.csv, ont-sa-characteristic-odsp-cma.csv, 2005-2025-cma-population.csv in the repository root.
 """
 import csv
 import json
@@ -11,7 +11,7 @@ from pathlib import Path
 from statistics import mean
 
 ROOT = Path(__file__).resolve().parents[1]
-RAW = ROOT / "data" / "raw"
+RAW = ROOT
 CODES = (505, 521, 529, 532, 535, 537, 539, 541, 543, 550, 555, 559, 568, 580, 595)
 YEARS = range(2005, 2026)
 OW_FIELDS = ("cases", "fts", "ftsp", "ftc", "age24", "age2554", "age55", "moa04", "moa512", "moa1318", "moa19")
@@ -36,7 +36,7 @@ def annual_cases(filename, fields):
 
 def population():
     output = {}
-    for row in read_csv("cma_population_2005_2025.csv"):
+    for row in read_csv("2005-2025-cma-population.csv"):
         dguid = row["DGUID"]
         if not dguid or not (dguid.startswith("2021S0503") or dguid == "2021S050535505"):
             continue
@@ -51,8 +51,8 @@ def population():
     return output
 
 def main():
-    ow = annual_cases("ow_cma.csv", OW_FIELDS)
-    odsp = annual_cases("odsp_cma.csv", ODSP_FIELDS)
+    ow = annual_cases("ont-sa-characteristic-ow-cma.csv", OW_FIELDS)
+    odsp = annual_cases("ont-sa-characteristic-odsp-cma.csv", ODSP_FIELDS)
     pop = population()
     expected = {(code, year) for code in CODES for year in YEARS}
     for name, records in (("OW", ow), ("ODSP", odsp), ("population", pop)):
