@@ -126,3 +126,46 @@ h2 { font-size:18px; }
  .rank { grid-template-columns:minmax(115px,1.2fr) minmax(80px,1fr) 50px; }
 }
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+
+/* Review fix: distribute the controls rather than clustering them on the left. */
+@media(min-width:1050px){
+ .topcontrols{display:grid;grid-template-columns:minmax(330px,1.5fr) minmax(180px,.75fr) minmax(245px,1fr);align-items:end;column-gap:24px;width:100%}
+ .periodcontrol{width:100%;max-width:none;min-width:0}
+ .range-wrap{width:100%;min-width:0}
+ .programcontrol{width:100%;max-width:245px}
+ .programcontrol select{width:100%}
+ .view-mode-control{justify-self:end;min-width:245px}
+}
+/* The map must not crop the southern CMA dots in either display mode. */
+.overview-mode .map{aspect-ratio:880/450!important;overflow:hidden}
+.overview-mode .map>svg#svg{aspect-ratio:880/450!important;transform:none!important}
+/* Overview is a fit-to-screen workspace, not merely smaller padding.
+   Zoom reduces the entire dashboard including its headings and chart canvas,
+   while preserving all four visualizations and their linked controls. */
+@media(min-width:1050px){
+ body.overview-mode{padding:0 10px 8px;overflow-x:hidden}
+ .overview-mode main{zoom:.68;max-width:none;width:100%}
+ .overview-mode header{margin-bottom:4px}
+ .overview-mode h1{font-size:22px}
+ .overview-mode header p{font-size:11px}
+ .overview-mode .topcontrols{grid-template-columns:minmax(340px,1.5fr) minmax(190px,.75fr) minmax(240px,1fr)}
+ .overview-mode .metrics{margin:5px 0}
+ .overview-mode .metric{min-height:59px;padding:6px 10px}
+ .overview-mode .metric b{font-size:19px}
+ .overview-mode .metric-instruction{gap:0}
+ .overview-mode .layout,.overview-mode .bottom-layout{grid-template-columns:minmax(0,1.9fr) minmax(390px,1fr)}
+ .overview-mode .maptoolbar{margin:0 0 3px}
+ .overview-mode .mapmetadata{margin:0 0 3px}
+ .overview-mode .legend{margin-top:3px}
+ .overview-mode .note{margin-top:3px}
+ .overview-mode .bottom-layout{margin-top:6px}
+ .overview-mode #trendChart{max-height:205px}
+ .overview-mode .methodology{display:none}
+ .overview-mode .status{display:none}
+}
+@media(min-width:1050px) and (max-height:760px){
+ .overview-mode main{zoom:.59}
+}
+@media(min-width:1050px) and (min-height:950px){
+ .overview-mode main{zoom:.75}
+}
