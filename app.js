@@ -45,6 +45,22 @@ function renderMap(){
  'Windsor':[-18,20],'Kingston':[32,-14],'Ottawa–Gatineau (Ont. part)':[0,-19]};
  const labels=features.map(f=>{let c=name(f),xy=path.centroid(f),o=offsets[c[0]]||[0,-13];
  return {c,x:xy[0],y:xy[1],lx:xy[0]+o[0],ly:xy[1]+o[1],text:short[c[0]]||c[1]}}).filter(d=>Number.isFinite(d.x)&&Number.isFinite(d.y));
+ // Displace only crowded dots (not their geographic reference centroids).
+ // Every dot has exactly the same radius; thin leaders retain geographic meaning.
+ for(let pass=0;pass<90;pass++){
+  let adjusted=false;
+  for(let i=0;i<labels.length;i++)for(let j=i+1;j<labels.length;j++){
+   const p=labels[i],q=labels[j],dx=q.x-p.x,dy=q.y-p.y,dist=Math.hypot(dx,dy);
+   if(dist>=30)continue;
+   adjusted=true;
+   const angle=dist>0.01?Math.atan2(dy,dx):(i+j)*1.618;
+   const shift=(30-dist)/2+.1,ux=Math.cos(angle),uy=Math.sin(angle);
+   p.x-=ux*shift;p.y-=uy*shift;q.x+=ux*shift;q.y+=uy*shift;
+   for(const d of [p,q]){d.x=Math.max(15,Math.min(865,d.x));d.y=Math.max(15,Math.min(435,d.y))}
+  }
+  if(!adjusted)break;
+ }
+ labels.forEach(d=>{const o=offsets[d.c[0]]||[0,-13];d.lx=d.x+o[0];d.ly=d.y+o[1]});
  labels.forEach(d=>{d.w=d.text.length*6.6+6;d.lx=Math.max(d.w/2+6,Math.min(874-d.w/2,d.lx));d.ly=Math.max(17,Math.min(440,d.ly))});
  for(let pass=0;pass<90;pass++){
  let any=false;
@@ -73,7 +89,14 @@ function renderMap(){
   .on('pointermove',(e,d)=>showTip(e,d.c))
   .on('pointerleave',()=>tip.style.display='none')
   .on('keydown',(e,d)=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();select(d.c)}});
- layer.selectAll('line.leader').data(labels,d=>d.c[0]).join('line').attr('class','leader')
+ // Keep leader lines behind the dots and labels.
+ layer.selectAll('line.dot-origin').data(labels.filter(d=>Math.hypot(d.x-path.centroid(features.find(f=>name(f)[0]===d.c[0]))[0],d.y-path.centroid(features.find(f=>name(f)[0]===d.c[0]))[1])>4),d=>d.c[0])
+ .join('line').attr('class','dot-origin')
+ .attr('x1',d=>path.centroid(features.find(f=>name(f)[0]===d.c[0]))[0])
+ .attr('y1',d=>path.centroid(features.find(f=>name(f)[0]===d.c[0]))[1])
+ .attr('x2',d=>d.x).attr('y2',d=>d.y)
+ .attr('stroke','#8296a0').attr('stroke-width',1.2);
+  layer.selectAll('line.leader').data(labels,d=>d.c[0]).join('line').attr('class','leader')
  .attr('x1',d=>d.x).attr('y1',d=>d.y).attr('x2',d=>d.lx).attr('y2',d=>d.ly-4)
  .attr('stroke','#6e8392').attr('stroke-width',.8)
  .attr('opacity',d=>Math.hypot(d.lx-d.x,d.ly-d.y)>17?.85:0);
