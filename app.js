@@ -19,9 +19,9 @@ function renderMap(){
  document.getElementById('map').classList.toggle('is-zoomed',zoom!=='all');
  const allFeatures=GEO.features.filter(f=>CMA.some(c=>String(CODES[c[0]])===String(f.properties.CMAUID)));
  const focusNames=['Toronto','Hamilton','Oshawa','Barrie','Guelph','Brantford','Kitchener–Cambridge–Waterloo','St. Catharines–Niagara','Peterborough'];
- const focus=zoom==='all'?allFeatures:allFeatures.filter(f=>focusNames.some(name=>String(CODES[name])===String(f.properties.CMAUID)));
+ const focus=zoom==='all'?allFeatures.filter(f=>String(f.properties.CMAUID)!=='595'):allFeatures.filter(f=>focusNames.some(name=>String(CODES[name])===String(f.properties.CMAUID)));
  // Fit all fifteen CMAs in the full view: no geographic repositioning or northern inset.
- const projection=d3.geoMercator().fitExtent([[48,24],[831,420]],{type:'FeatureCollection',features:focus});
+ const projection=d3.geoMercator().fitExtent([[38,26],[825,415]],{type:'FeatureCollection',features:focus});
  const path=d3.geoPath(projection);
  d3.select('#contextLayer').selectAll('path.context-land')
   .data((CONTEXT?.features||[]).filter(f=>String(f.properties?.PRUID)==='35'))
@@ -42,7 +42,7 @@ function renderMap(){
   'Ottawa–Gatineau (Ont. part)':[20,-24],
   'Greater Sudbury':[23,-25],'Thunder Bay':[24,-23]
  };
- const dots=allFeatures.map(f=>{
+ const dots=allFeatures.filter(f=>String(f.properties.CMAUID)!=='595').map(f=>{
    const c=byName(f),xy=path.centroid(f);
    if(!c||!xy.every(Number.isFinite))return null;
    const offset=labelOffsets[c[0]]||[24,-14];
@@ -99,6 +99,23 @@ function renderMap(){
   .attr('text-anchor','middle').text(d=>d.label)
   .style('pointer-events','none');
  svg.setAttribute('viewBox','0 0 880 450');
+ renderThunderInset();
+}
+function renderThunderInset(){
+ const el=document.getElementById('thunderInset'),layer=d3.select('#thunderLayer');
+ if(!el||!GEO)return;
+ el.style.display=zoom==='all'?'block':'none';
+ if(zoom!=='all')return;
+ const f=GEO.features.find(f=>String(f.properties.CMAUID)==='595');
+ if(!f)return;
+ const projection=d3.geoMercator().fitExtent([[18,16],[142,98]],f),path=d3.geoPath(projection);
+ layer.selectAll('path').data([f]).join('path').attr('d',path).attr('fill','#e9eee9').attr('stroke','#879ca9').attr('stroke-width',1);
+ const center=path.centroid(f),c=CMA.find(c=>c[0]==='Thunder Bay');
+ layer.selectAll('circle').data([c]).join('circle').attr('cx',center[0]).attr('cy',center[1]).attr('r',12)
+ .attr('fill',color(change(c))).attr('stroke',selected==='Thunder Bay'?'#182a37':'#fff')
+ .attr('stroke-width',selected==='Thunder Bay'?3.5:2).style('cursor','pointer')
+ .on('click',()=>select(c)).on('pointerenter',e=>showTip(e,c)).on('pointermove',e=>showTip(e,c))
+ .on('pointerleave',()=>tip.style.display='none');
 }
 function render(){document.getElementById('mapPeriod').textContent=startYear+'–'+endYear;
  document.getElementById('mapDescription').textContent='% change in '+(program==='both'?'OW + ODSP':program.toUpperCase())+' rate per 1,000 residents, '+startYear+' → '+endYear;
