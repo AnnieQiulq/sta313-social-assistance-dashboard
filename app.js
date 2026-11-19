@@ -6,7 +6,7 @@ const CODES={'Toronto':535,'Hamilton':537,'Ottawa–Gatineau (Ont. part)':505,'K
 function rec(c,year){return DATA[CODES[c[0]]+'-'+year]}
 function rate(c,year,prog=program){let d=rec(c,year);if(!d)return NaN;let cases=prog==='both'?d.ow.cases+d.odsp.cases:d[prog].cases;return 1000*cases/d.population}
 function change(c){const a=rate(c,startYear),b=rate(c,endYear);return a?100*(b-a)/a:NaN}
-function color(v){return v>=15?'#2f5f93':v>=5?'#8fb0d3':v>-5?'#d9d6cf':v>-15?'#e39a72':'#b4451f'}
+function color(v){return v>=15?'#ad4d2d':v>=5?'#e0a07d':v>-5?'#d9d6cf':v>-15?'#8fb0d3':'#365d90'}
 function fmt(v){return (v>0?'+':'')+v.toFixed(1)+'%'}
 function node(tag,attrs){let e=document.createElementNS(ns,tag);for(let [k,v] of Object.entries(attrs))e.setAttribute(k,v);return e}
 function select(c){selected=c[0];render();renderBottom();document.getElementById('status').innerHTML='<strong>Selected:</strong> '+c[0]+' · Real '+startYear+' rate: '+rate(c,startYear).toFixed(1)+' · '+endYear+' rate: '+rate(c,endYear).toFixed(1)+' per 1,000 · Change: '+fmt(change(c))}
