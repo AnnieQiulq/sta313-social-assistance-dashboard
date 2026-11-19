@@ -206,3 +206,36 @@ h2 { font-size:18px; }
  .overview-mode .methodology{display:block}
  .overview-mode .status{display:block}
 }
+
+/* Reference-based compact geography: southern CMAs on the main map, Thunder Bay inset. */
+.map{position:relative}
+.thunder-inset{position:absolute;left:12px;top:12px;width:175px;padding:7px 9px;background:#fafaf8f0;border:1px solid #b8c6ce;border-radius:9px;box-shadow:0 2px 8px #22334412;z-index:2}
+.thunder-title{font-size:11px;font-weight:700;color:#34465a}
+.thunder-inset svg{width:100%;height:88px;display:block}
+.map.is-zoomed .thunder-inset{display:none!important}
+@media(min-width:1050px){
+ .layout,.bottom-layout,.overview-mode .layout,.overview-mode .bottom-layout{grid-template-columns:minmax(0,1.35fr) minmax(390px,1fr)!important}
+ .overview-mode header{margin-bottom:5px}
+ .overview-mode .topcontrols{gap:10px}
+ .overview-mode .metrics{margin:5px 0}
+ .overview-mode .metric{min-height:57px;padding:7px 12px}
+ .overview-mode .metric-instruction{font-size:11px}
+ .overview-mode .map{height:230px!important;aspect-ratio:auto!important}
+ .overview-mode .map>svg#svg{height:100%!important;width:100%!important;aspect-ratio:auto!important}
+ .overview-mode .card{padding:9px 13px}
+ .overview-mode .cardhead{margin-bottom:3px}
+ .overview-mode .maptoolbar{margin:0 0 2px}
+ .overview-mode .mapmetadata{margin:0 0 2px}
+ .overview-mode .rank{min-height:19px;padding:1px 5px}
+ .overview-mode .policy-readout{margin-top:4px;padding-top:4px}
+ .overview-mode .bottom-layout{margin-top:5px}
+ .overview-mode #trendChart{max-height:185px}
+ .overview-mode .tabs{margin:2px 0 5px}
+ .overview-mode .demogrow{margin:5px 0}
+ .overview-mode .methodology{display:none}
+ .overview-mode .status{display:none}
+ .overview-mode .thunder-inset{width:125px;top:5px;left:5px;padding:4px 6px}
+ .overview-mode .thunder-title{font-size:10px}
+ .overview-mode .thunder-inset svg{height:58px}
+}
+@media(max-width:1049px){.thunder-inset{width:140px}.thunder-inset svg{height:72px}}
