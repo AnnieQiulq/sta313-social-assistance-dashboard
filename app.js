@@ -142,7 +142,7 @@ function renderThunderInset(){
  const sites=features.map(f=>({f,xy:path.centroid(f),name:c(f)[0]}));
  // Labels use separate fixed locations so neither overlaps the other dot.
  const placements={'Thunder Bay':{x:14,y:27,anchor:'start'},
-  'Greater Sudbury':{x:151,y:95,anchor:'end'}};
+  'Greater Sudbury':{x:151,y:64,anchor:'end'}};
  layer.selectAll('line.inset-leader').data(sites,d=>d.name).join('line')
   .attr('class','inset-leader').attr('x1',d=>d.xy[0]).attr('y1',d=>d.xy[1])
   .attr('x2',d=>placements[d.name].x).attr('y2',d=>placements[d.name].y-4)
@@ -162,7 +162,7 @@ function renderThunderInset(){
   .attr('y',d=>placements[d.name].y)
   .attr('text-anchor',d=>placements[d.name].anchor)
   .text(d=>d.name).style('pointer-events','none');
- const contextLabels=[{text:'Lake Superior',x:48,y:72}, {text:'Lake Huron',x:112,y:59}];
+ const contextLabels=[{text:'Lake Superior',x:48,y:72}, {text:'Lake Huron',x:112,y:105}];
  layer.selectAll('text.inset-context-label').data(contextLabels,d=>d.text).join('text')
   .attr('class','inset-context-label').attr('x',d=>d.x)
   .attr('y',d=>d.y).attr('text-anchor','middle')
