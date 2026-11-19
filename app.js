@@ -120,7 +120,7 @@ function renderThunderInset(){
  layer.selectAll('circle.inset-dot').data(features,f=>f.properties.CMAUID).join('circle')
  .attr('class','inset-dot')
  .attr('cx',f=>path.centroid(f)[0]).attr('cy',f=>path.centroid(f)[1])
- .attr('r',8).attr('fill',f=>color(change(c(f))))
+ .attr('r',10.5).attr('fill',f=>color(change(c(f))))
  .attr('stroke',f=>selected===c(f)[0]?'#1f2937':'#fff')
  .attr('stroke-width',f=>selected===c(f)[0]?3:1.5)
  .style('cursor','pointer').attr('tabindex',0).attr('role','button')
