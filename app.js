@@ -112,26 +112,48 @@ function renderThunderInset(){
  if(zoom!=='all')return;
  const names=['Thunder Bay','Greater Sudbury'];
  const features=GEO.features.filter(f=>names.some(n=>String(CODES[n])===String(f.properties.CMAUID)));
- const projection=d3.geoMercator().fitExtent([[12,17],[148,96]],{type:'FeatureCollection',features}),path=d3.geoPath(projection);
+ // A fixed geographic viewport shows the surrounding provincial coastline
+ // and Great Lakes, rather than fitting only the two small CMA polygons.
+ const viewport={type:'Polygon',coordinates:[[[-91.8,45.0],[-78.0,45.0],[-78.0,50.5],[-91.8,50.5],[-91.8,45.0]]]};
+ const projection=d3.geoMercator().fitExtent([[8,20],[152,105]],viewport),path=d3.geoPath(projection);
  const c=f=>CMA.find(x=>String(CODES[x[0]])===String(f.properties.CMAUID));
- layer.selectAll('path').data(features,f=>f.properties.CMAUID).join('path')
- .attr('d',path).attr('fill','#e9eee9').attr('stroke','#8ba1ac')
- .attr('stroke-width',1).style('pointer-events','none');
- layer.selectAll('circle.inset-dot').data(features,f=>f.properties.CMAUID).join('circle')
- .attr('class','inset-dot')
- .attr('cx',f=>path.centroid(f)[0]).attr('cy',f=>path.centroid(f)[1])
- .attr('r',10.5).attr('fill',f=>color(change(c(f))))
- .attr('stroke',f=>selected===c(f)[0]?'#1f2937':'#fff')
- .attr('stroke-width',f=>selected===c(f)[0]?3:1.5)
- .style('cursor','pointer').attr('tabindex',0).attr('role','button')
- .on('click',(e,f)=>select(c(f))).on('pointerenter',(e,f)=>showTip(e,c(f)))
- .on('pointermove',(e,f)=>showTip(e,c(f))).on('pointerleave',()=>tip.style.display='none')
- .on('keydown',(e,f)=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();select(c(f))}});
- layer.selectAll('text.inset-label').data(features,f=>f.properties.CMAUID).join('text')
- .attr('class','inset-label').attr('x',f=>path.centroid(f)[0])
- .attr('y',f=>path.centroid(f)[1]-7).attr('text-anchor','middle')
- .text(f=>c(f)[1]).style('pointer-events','none');
+ const ontario=(CONTEXT?.features||[]).find(f=>String(f.properties?.PRUID)==='35');
+ layer.selectAll('path.inset-context').data(ontario?[ontario]:[]).join('path')
+  .attr('class','inset-context').attr('d',path).attr('fill','#f5f4ef')
+  .attr('stroke','#aebfc8').attr('stroke-width',.8).style('pointer-events','none');
+ layer.selectAll('path.inset-region').data(features,f=>f.properties.CMAUID).join('path')
+  .attr('class','inset-region').attr('d',path).attr('fill','#e8eeea')
+  .attr('stroke','#8197a4').attr('stroke-width',.9).style('pointer-events','none');
+ const sites=features.map(f=>({f,xy:path.centroid(f),name:c(f)[0]}));
+ layer.selectAll('line.inset-leader').data(sites,d=>d.name).join('line')
+  .attr('class','inset-leader').attr('x1',d=>d.xy[0]).attr('y1',d=>d.xy[1])
+  .attr('x2',d=>d.name==='Thunder Bay'?d.xy[0]+17:d.xy[0]-12)
+  .attr('y2',d=>d.name==='Thunder Bay'?d.xy[1]-10:d.xy[1]-11)
+  .attr('stroke','#718b99').attr('stroke-width',.7);
+ layer.selectAll('circle.inset-dot').data(sites,d=>d.name).join('circle')
+  .attr('class','inset-dot').attr('cx',d=>d.xy[0]).attr('cy',d=>d.xy[1])
+  .attr('r',10.5).attr('fill',d=>color(change(c(d.f))))
+  .attr('stroke',d=>selected===d.name?'#1f2937':'#fff')
+  .attr('stroke-width',d=>selected===d.name?3:1.5)
+  .style('cursor','pointer').attr('tabindex',0).attr('role','button')
+  .attr('aria-label',d=>d.name+'; select CMA')
+  .on('click',(e,d)=>select(c(d.f))).on('pointerenter',(e,d)=>showTip(e,c(d.f)))
+  .on('pointermove',(e,d)=>showTip(e,c(d.f))).on('pointerleave',()=>tip.style.display='none')
+  .on('keydown',(e,d)=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();select(c(d.f))}});
+ const placeLabels=sites.map(d=>({text:d.name==='Thunder Bay'?'Thunder Bay':'Greater Sudbury',
+  x:d.name==='Thunder Bay'?d.xy[0]+19:d.xy[0]-14,y:d.xy[1]-12,
+  anchor:d.name==='Thunder Bay'?'start':'end'}));
+ layer.selectAll('text.inset-label').data(placeLabels,d=>d.text).join('text')
+  .attr('class','inset-label').attr('x',d=>d.x).attr('y',d=>d.y)
+  .attr('text-anchor',d=>d.anchor).text(d=>d.text).style('pointer-events','none');
+ const contextLabels=[{text:'Lake Superior',lon:-87.8,lat:47.1},
+  {text:'Lake Huron',lon:-82.6,lat:45.7},{text:'ONTARIO',lon:-85.2,lat:49.0}];
+ layer.selectAll('text.inset-context-label').data(contextLabels,d=>d.text).join('text')
+  .attr('class','inset-context-label').attr('x',d=>projection([d.lon,d.lat])[0])
+  .attr('y',d=>projection([d.lon,d.lat])[1]).attr('text-anchor','middle')
+  .text(d=>d.text).style('pointer-events','none');
 }
+
 function render(){document.getElementById('mapPeriod').textContent=startYear+'–'+endYear;
  document.getElementById('mapDescription').textContent='% change in '+(program==='both'?'OW + ODSP':program.toUpperCase())+' rate per 1,000 residents, '+startYear+' → '+endYear;
  document.getElementById('rankingSubtitle').textContent='% change in '+(program==='both'?'OW + ODSP':program.toUpperCase())+' rate per 1,000, '+startYear+' → '+endYear;
