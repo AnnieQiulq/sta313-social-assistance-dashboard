@@ -31,7 +31,22 @@ function renderMap(){
  d3.select('#contextLayer').selectAll('path.context-land')
   .data((CONTEXT?.features||[]).filter(f=>String(f.properties?.PRUID)==='35'))
   .join('path').attr('class','context-land').attr('d',path);
- const areas=d3.select('#areas');
+ // Muted geographic reference labels in the large map, kept behind CMA dots.
+ const geoLabels=[
+  {text:'Georgian Bay',lon:-81.2,lat:45.45},
+  {text:'Lake Huron',lon:-82.2,lat:44.2},
+  {text:'Lake Ontario',lon:-77.95,lat:43.45},
+  {text:'Lake Erie',lon:-81.4,lat:42.35},
+  {text:'QUEBEC',lon:-75.65,lat:46.05},
+  {text:'UNITED STATES',lon:-82.8,lat:42.0}
+ ];
+ d3.select('#contextLayer').selectAll('text.geo-reference').data(zoom==='all'?geoLabels:geoLabels.slice(0,4),d=>d.text)
+  .join('text').attr('class','geo-reference')
+  .attr('x',d=>projection([d.lon,d.lat])[0])
+  .attr('y',d=>projection([d.lon,d.lat])[1])
+  .attr('text-anchor','middle').text(d=>d.text)
+  .style('pointer-events','none');
+  const areas=d3.select('#areas');
  // Geographic outlines remain a neutral background: values are encoded ONLY by dots.
  areas.selectAll('path.region').data(features,d=>code(d)).join('path')
   .attr('class','region dot-boundary').attr('d',path)
@@ -135,7 +150,7 @@ function renderThunderInset(){
   .attr('stroke','#6c8391').attr('stroke-width',.8);
  layer.selectAll('circle.inset-dot').data(sites,d=>d.name).join('circle')
   .attr('class','inset-dot').attr('cx',d=>d.xy[0]).attr('cy',d=>d.xy[1])
-  .attr('r',10.5).attr('fill',d=>color(change(c(d.f))))
+  .attr('r',7).attr('fill',d=>color(change(c(d.f))))
   .attr('stroke',d=>selected===d.name?'#1f2937':'#fff')
   .attr('stroke-width',d=>selected===d.name?3:1.5)
   .style('cursor','pointer').attr('tabindex',0).attr('role','button')
@@ -148,8 +163,7 @@ function renderThunderInset(){
   .attr('y',d=>placements[d.name].y)
   .attr('text-anchor',d=>placements[d.name].anchor)
   .text(d=>d.name).style('pointer-events','none');
- const contextLabels=[{text:'Lake Superior',lon:-87.8,lat:47.1},
-  {text:'Lake Huron',lon:-82.3,lat:45.5},{text:'Ontario',lon:-85.0,lat:49.0}];
+ const contextLabels=[{text:'Lake Superior',lon:-87.8,lat:46.65}];
  layer.selectAll('text.inset-context-label').data(contextLabels,d=>d.text).join('text')
   .attr('class','inset-context-label').attr('x',d=>projection([d.lon,d.lat])[0])
   .attr('y',d=>projection([d.lon,d.lat])[1]).attr('text-anchor','middle')
