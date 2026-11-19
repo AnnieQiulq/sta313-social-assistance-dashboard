@@ -37,8 +37,7 @@ function renderMap(){
   {text:'Lake Huron',lon:-82.2,lat:44.2},
   {text:'Lake Ontario',lon:-77.95,lat:43.45},
   {text:'Lake Erie',lon:-81.4,lat:42.35},
-  {text:'QUEBEC',lon:-75.65,lat:46.05},
-  {text:'UNITED STATES',lon:-82.8,lat:42.0}
+  {text:'QUEBEC',lon:-75.65,lat:46.05}
  ];
  d3.select('#contextLayer').selectAll('text.geo-reference').data(zoom==='all'?geoLabels:geoLabels.slice(0,4),d=>d.text)
   .join('text').attr('class','geo-reference')
@@ -163,10 +162,10 @@ function renderThunderInset(){
   .attr('y',d=>placements[d.name].y)
   .attr('text-anchor',d=>placements[d.name].anchor)
   .text(d=>d.name).style('pointer-events','none');
- const contextLabels=[{text:'Lake Superior',lon:-87.8,lat:46.65}];
+ const contextLabels=[{text:'Lake Superior',x:47,y:72}, {text:'Lake Huron',x:91,y:99}];
  layer.selectAll('text.inset-context-label').data(contextLabels,d=>d.text).join('text')
-  .attr('class','inset-context-label').attr('x',d=>projection([d.lon,d.lat])[0])
-  .attr('y',d=>projection([d.lon,d.lat])[1]).attr('text-anchor','middle')
+  .attr('class','inset-context-label').attr('x',d=>d.x)
+  .attr('y',d=>d.y).attr('text-anchor','middle')
   .text(d=>d.text).style('pointer-events','none');
 }
 
