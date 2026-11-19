@@ -21,7 +21,7 @@ function renderMap(){
  const focusNames=['Toronto','Hamilton','Oshawa','Barrie','Guelph','Brantford','Kitchener–Cambridge–Waterloo','St. Catharines–Niagara','Peterborough'];
  const focus=zoom==='all'?allFeatures:allFeatures.filter(f=>focusNames.some(name=>String(CODES[name])===String(f.properties.CMAUID)));
  // Fit all fifteen CMAs in the full view: no geographic repositioning or northern inset.
- const projection=d3.geoMercator().fitExtent([[38,35],[620,458]],{type:'FeatureCollection',features:focus});
+ const projection=d3.geoMercator().fitExtent([[48,24],[831,420]],{type:'FeatureCollection',features:focus});
  const path=d3.geoPath(projection);
  d3.select('#contextLayer').selectAll('path.context-land')
   .data((CONTEXT?.features||[]).filter(f=>String(f.properties?.PRUID)==='35'))
@@ -34,13 +34,13 @@ function renderMap(){
  const byName=f=>CMA.find(c=>String(CODES[c[0]])===String(f.properties.CMAUID));
  const labelNames={'Ottawa–Gatineau (Ont. part)':'Ottawa–Gatineau','Kitchener–Cambridge–Waterloo':'Kitchener–C–W','St. Catharines–Niagara':'St. Catharines–N.'};
  const labelOffsets={
-  'Toronto':[-24,-19],'Hamilton':[-23,28],'Oshawa':[34,-12],
-  'Barrie':[12,-17],'Guelph':[-33,-20],'Brantford':[-35,30],
-  'Kitchener–Cambridge–Waterloo':[-48,-32],
-  'St. Catharines–Niagara':[42,25],'Peterborough':[35,-12],
-  'London':[-23,25],'Windsor':[-10,23],'Kingston':[28,-13],
-  'Ottawa–Gatineau (Ont. part)':[30,-16],
-  'Greater Sudbury':[25,-14],'Thunder Bay':[30,-14]
+  'Toronto':[22,-25],'Hamilton':[-20,29],'Oshawa':[24,19],
+  'Barrie':[-8,-26],'Guelph':[-25,-25],'Brantford':[-29,30],
+  'Kitchener–Cambridge–Waterloo':[-23,-38],
+  'St. Catharines–Niagara':[28,29],'Peterborough':[22,-24],
+  'London':[-18,29],'Windsor':[-18,28],'Kingston':[28,-22],
+  'Ottawa–Gatineau (Ont. part)':[20,-24],
+  'Greater Sudbury':[23,-25],'Thunder Bay':[24,-23]
  };
  const dots=allFeatures.map(f=>{
    const c=byName(f),xy=path.centroid(f);
@@ -48,13 +48,38 @@ function renderMap(){
    const offset=labelOffsets[c[0]]||[24,-14];
    return {c,x:xy[0],y:xy[1],lx:xy[0]+offset[0],ly:xy[1]+offset[1],label:labelNames[c[0]]||c[0]};
  }).filter(Boolean);
+ // Collision-aware label placement in SVG coordinates: preserve the CMA markers'
+ // actual geography while moving only the explanatory text and leader lines.
+ const overlaps=(a,b)=>Math.abs(a.lx-b.lx)<(a.w+b.w)/2+9&&Math.abs(a.ly-b.ly)<16;
+ dots.forEach(d=>{d.w=d.label.length*6.2+5;d.lx=Math.max(d.w/2+8,Math.min(872-d.w/2,d.lx));d.ly=Math.max(18,Math.min(440,d.ly))});
+ const ordered=[...dots].sort((a,b)=>a.y-b.y);
+ for(let pass=0;pass<135;pass++){
+   let moved=false;
+   for(let i=0;i<ordered.length;i++)for(let j=i+1;j<ordered.length;j++){
+     const a=ordered[i],b=ordered[j];
+     if(!overlaps(a,b))continue;
+     moved=true;
+     const dx=b.lx-a.lx,dy=b.ly-a.ly;
+     const overlapX=(a.w+b.w)/2+10-Math.abs(dx);
+     const overlapY=16-Math.abs(dy);
+     if(overlapY<overlapX*.6){
+       const shift=(overlapY+1)/2;
+       a.ly-=dy>=0?shift:-shift;b.ly+=dy>=0?shift:-shift;
+     }else{
+       const shift=(overlapX+1)/2;
+       a.lx-=dx>=0?shift:-shift;b.lx+=dx>=0?shift:-shift;
+     }
+     for(const d of [a,b]){d.lx=Math.max(d.w/2+8,Math.min(872-d.w/2,d.lx));d.ly=Math.max(18,Math.min(438,d.ly))}
+   }
+   if(!moved)break;
+ }
  const labelLayer=d3.select('#labels');
  labelLayer.selectAll('text.context-place').remove();
  labelLayer.selectAll('line.leader').data(dots,d=>d.c[0]).join('line')
   .attr('class','leader').attr('x1',d=>d.x).attr('y1',d=>d.y)
   .attr('x2',d=>d.lx).attr('y2',d=>d.ly-4)
-  .attr('stroke','#82949e').attr('stroke-width',.9)
-  .attr('opacity',d=>Math.hypot(d.lx-d.x,d.ly-d.y)>19?.8:0);
+  .attr('stroke','#82949e').attr('stroke-width',.85)
+  .attr('opacity',d=>Math.hypot(d.lx-d.x,d.ly-d.y)>24?.74:0);
  const marks=labelLayer.selectAll('circle.cma-dot').data(dots,d=>d.c[0]);
  marks.join('circle').attr('class','cma-dot').attr('cx',d=>d.x).attr('cy',d=>d.y)
   .attr('r',11.7).attr('fill',d=>color(change(d.c)))
@@ -69,19 +94,38 @@ function renderMap(){
   .on('pointerleave',()=>tip.style.display='none')
   .on('keydown',(e,d)=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();select(d.c)}});
  labelLayer.selectAll('text.maplabel').data(dots,d=>d.c[0]).join('text')
-  .attr('class','maplabel').attr('x',d=>Math.max(12,Math.min(645,d.lx)))
-  .attr('y',d=>Math.max(18,Math.min(485,d.ly)))
+  .attr('class','maplabel').attr('x',d=>d.lx)
+  .attr('y',d=>d.ly)
   .attr('text-anchor','middle').text(d=>d.label)
   .style('pointer-events','none');
- svg.setAttribute('viewBox','0 0 660 500');
+ svg.setAttribute('viewBox','0 0 880 450');
 }
 function render(){document.getElementById('mapPeriod').textContent=startYear+'–'+endYear;
  document.getElementById('mapDescription').textContent='% change in '+(program==='both'?'OW + ODSP':program.toUpperCase())+' rate per 1,000 residents, '+startYear+' → '+endYear;
  document.getElementById('rankingSubtitle').textContent='% change in '+(program==='both'?'OW + ODSP':program.toUpperCase())+' rate per 1,000, '+startYear+' → '+endYear;
- renderMap();
+ renderMap();updateReadout();
  const rank=document.getElementById('ranking');rank.replaceChildren();
  for(let c of [...CMA].sort((a,b)=>change(b)-change(a))){let v=change(c),b=document.createElement('button');b.className='rank'+(selected===c[0]?' selected':'');b.innerHTML='<span class="name" title="'+c[0]+'">'+c[1]+'</span><span class="bartrack"><span class="bar" style="left:'+(v>=0?50:50-Math.min(48,Math.abs(v)*1.3))+'%;width:'+Math.min(48,Math.abs(v)*1.3)+'%;background:'+color(v)+'"></span></span><span class="num">'+fmt(v)+'</span>';b.onclick=()=>select(c);rank.append(b)}
 }
+function updateReadout(){
+ const c=CMA.find(x=>x[0]===selected);if(!c||!DATA||!rec(c,startYear))return;
+ const a=rate(c,startYear),b=rate(c,endYear),v=change(c);
+ const sorted=[...CMA].sort((x,y)=>change(y)-change(x));const rank=sorted.findIndex(x=>x[0]===selected)+1;
+ const label=program==='both'?'OW and ODSP combined':program==='ow'?'Ontario Works':'ODSP';
+ document.getElementById('readoutTitle').textContent=c[0]+' · '+(v>=0?'+' : '')+v.toFixed(1)+'%';
+ document.getElementById('readoutBody').textContent=label+' caseload rate changed from '+a.toFixed(1)+' to '+b.toFixed(1)+' cases per 1,000 residents between '+startYear+' and '+endYear+'. Ranked '+rank+' of 15 CMAs by rate growth. Click another CMA to compare its pattern.';
+}
+function setMode(mode){
+ const isOverview=mode==='overview';
+ document.body.classList.toggle('overview-mode',isOverview);
+ for(const [id,isActive] of [['focusMode',!isOverview],['overviewMode',isOverview]]){
+  const el=document.getElementById(id);
+  el.classList.toggle('active',isActive);el.setAttribute('aria-pressed',String(isActive));
+ }
+ document.getElementById('modeHelp').textContent=isOverview?'Overview: compare all four views with less scrolling':'Focus: inspect one CMA in detail';
+}
+document.getElementById('focusMode').onclick=()=>setMode('focus');
+document.getElementById('overviewMode').onclick=()=>setMode('overview');
 document.getElementById('all').onclick=()=>setZoom('all');document.getElementById('gtha').onclick=()=>setZoom('gtha');function setZoom(z){zoom=z;for(let id of ['all','gtha'])document.getElementById(id).classList.toggle('active',id===z);render()}
 
 let demographicMode='household';
