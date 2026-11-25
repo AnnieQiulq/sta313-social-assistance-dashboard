@@ -421,3 +421,20 @@ body .instruction-scroll::-webkit-scrollbar-button{display:none;width:0;height:0
 .layout>.card:first-child .maptoolbar{margin:0 0 2px!important;min-height:0!important}
 .layout>.card:first-child .maptoolbar p{margin:0!important}
 .layout>.card:first-child .mapmetadata{margin:2px 0 6px!important}
+
+/* Compact header: explicit two-row map heading and two full instruction lines. */
+body main header{gap:4px!important;row-gap:4px!important}
+body main header>div:first-child p{margin-bottom:0!important}
+body main header .topcontrols{margin-top:0!important}
+body main .metrics .metric{height:96px!important;min-height:96px!important;padding:7px 12px!important}
+body main .metrics .metric-instruction{display:grid!important;grid-template-rows:18px 44px;align-content:center!important;gap:3px!important}
+body main .metrics .metric-instruction .instruction-heading{margin:0!important;line-height:18px!important}
+body main .metrics .metric-instruction .instruction-scroll{height:44px!important;max-height:44px!important;min-height:44px!important;line-height:20px!important;padding-top:0!important;padding-bottom:0!important}
+body main .metrics .metric-instruction .instruction-scroll div{margin:0 0 2px!important;line-height:20px!important}
+body main .layout>.card:first-child .cardhead{display:flex!important;flex-wrap:nowrap!important;gap:8px!important;margin:0 0 4px!important;align-items:center!important}
+body main .layout>.card:first-child .cardhead h2{flex:1 1 auto;min-width:0;font-size:clamp(14px,1.05vw,18px)!important}
+body main .layout>.card:first-child .cardhead .zoomgroup{flex:0 0 auto!important;padding:3px!important;gap:2px!important;margin:0!important}
+body main .layout>.card:first-child .zoomgroup .pill{font-size:11px!important;padding:6px 7px!important}
+body main .layout>.card:first-child .maptoolbar{margin:0!important}
+body main .layout>.card:first-child .mapmetadata{margin:0 0 4px!important}
+@media(max-width:650px){body main .layout>.card:first-child .cardhead{flex-wrap:wrap!important}}
