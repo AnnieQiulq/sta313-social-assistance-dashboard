@@ -365,35 +365,36 @@ h2 { font-size:18px; }
 body:not(.overview-mode) .rank .name,body:not(.overview-mode) .rank .num{font-size:14px!important}body:not(.overview-mode) .rank-group{font-size:13px}body:not(.overview-mode) .ranking{max-height:470px;overflow-y:auto}body:not(.overview-mode) .rank{min-height:32px!important}.scale-label{font-size:13px!important;font-weight:750;display:inline-block;color:#25313d}.overview-mode .scale-label{font-size:12px!important}.overview-mode .instruction-scroll{max-height:none!important;overflow:visible;line-height:1.2;font-size:12px!important}.overview-mode .instruction-scroll div{margin-bottom:1px}.overview-mode .rank{min-height:15px!important;padding:0 5px!important;flex-shrink:0}.overview-mode .rank-group{padding:1px 5px;font-size:10px}.overview-mode .demogrow{margin:3px 0!important}.overview-mode .demogtrack{height:8px!important;margin-top:2px!important}.overview-mode .ranking{overflow-y:auto}.overview-mode #demogBars{overflow-y:auto}
 
 
-/* Unified desktop layout: aligned rows, compact controls, content-driven overflow. */
+
+/* Unified desktop layout — Nov 25: aligned pairs, compact summary, map priority. */
 @media(min-width:1050px){
-body:not(.overview-mode) header{margin-bottom:8px!important}
-body:not(.overview-mode) .metrics .metric{height:82px!important;min-height:0!important;box-sizing:border-box;padding:9px 15px!important}
-body:not(.overview-mode) .instruction-scroll{max-height:48px;overflow-y:auto}
-body:not(.overview-mode) .layout,body:not(.overview-mode) .bottom-layout{align-items:stretch!important}
-body:not(.overview-mode) .layout>.card,body:not(.overview-mode) .bottom-layout>.card{display:flex;flex-direction:column;min-height:0!important;height:auto!important}
-body:not(.overview-mode) .layout .map{height:clamp(290px,calc(100vh - 465px),490px)!important;min-height:0!important;aspect-ratio:auto!important}
-body:not(.overview-mode) .layout .map>svg#svg{width:100%;height:100%!important}
-body:not(.overview-mode) #ranking{flex:1 1 0!important;min-height:160px!important;max-height:clamp(190px,calc(100vh - 490px),450px)!important;overflow-y:auto!important}
-body:not(.overview-mode) .policy-readout{margin-top:auto}
-body:not(.overview-mode) #demogBars{max-height:290px;overflow-y:auto;min-height:0}
-body:not(.overview-mode) #trendChart{height:clamp(220px,30vh,310px)!important;max-height:none!important}
-body.overview-mode{height:auto!important;min-height:100vh;overflow-y:auto!important}
-.overview-mode main{display:flex!important;flex-direction:column;height:auto!important;min-height:0!important;gap:7px}
-.overview-mode .metrics .metric{height:64px!important;min-height:0!important;padding:6px 12px!important}
-.overview-mode .instruction-scroll{max-height:35px!important;overflow-y:auto!important}
-.overview-mode .layout,.overview-mode .bottom-layout{display:grid!important;grid-template-columns:minmax(0,1.35fr) minmax(350px,1fr)!important;align-items:stretch!important;flex:none!important;margin:0!important}
-.overview-mode .layout>.card,.overview-mode .bottom-layout>.card{height:auto!important;min-height:0!important;overflow:visible!important}
-.overview-mode .layout .map{flex:1 1 auto;min-height:260px!important;height:clamp(260px,33vh,380px)!important}
-.overview-mode .ranking,.overview-mode #demogBars{flex:0 0 auto!important;max-height:none!important;height:auto!important;overflow:visible!important}
-.overview-mode .rank{min-height:16px!important;line-height:1.1!important;margin:0!important}
-.overview-mode .rank .name,.overview-mode .rank .num{font-size:12px!important}
-.overview-mode .policy-readout{margin-top:auto!important}
-.overview-mode #trendChart{flex:1 1 auto;min-height:180px!important;height:220px!important;max-height:none!important}
-.overview-mode .demogrow{margin:3px 0!important}
-.overview-mode .demogtop{font-size:12px!important;line-height:1.15}
-.overview-mode .demogtrack{height:7px!important;margin-top:2px!important}
-.overview-mode .note,.overview-mode .policy-readout p,.overview-mode .metric small{font-size:12px!important}
-.overview-mode .legend{font-size:11px!important}
-.overview-mode .card>.note,.overview-mode .legend{flex-shrink:0!important}
+body main{height:auto!important;min-height:0!important}
+body header{margin-bottom:6px!important}
+body .metrics{margin:5px 0 8px!important;gap:8px!important}
+body .metrics .metric{height:70px!important;min-height:0!important;padding:7px 12px!important;box-sizing:border-box}
+body .instruction-scroll{max-height:40px!important;overflow-y:auto!important}
+body .layout,body .bottom-layout{display:grid!important;grid-template-columns:minmax(0,1.35fr) minmax(0,1fr)!important;align-items:stretch!important;gap:10px!important}
+body .layout>.card,body .bottom-layout>.card{display:flex!important;flex-direction:column;min-height:0!important;height:auto!important;box-sizing:border-box}
+body .layout .map{flex:1 1 auto!important;height:clamp(280px,calc(100vh - 390px),480px)!important;min-height:0!important;aspect-ratio:auto!important}
+body .layout .map>svg#svg{width:100%;height:100%!important}
+body:not(.overview-mode) #ranking{flex:1 1 0!important;min-height:150px!important;max-height:none!important;overflow-y:auto!important}
+body .policy-readout{margin-top:8px!important;flex-shrink:0}
+body:not(.overview-mode) .bottom-layout>.card{height:clamp(340px,48vh,460px)!important}
+body:not(.overview-mode) #demogBars{flex:1 1 0!important;min-height:0!important;max-height:none!important;overflow-y:auto!important}
+body #trendChart{flex:1 1 0!important;min-height:0!important;height:auto!important;max-height:none!important;width:100%}
+body .card>.note,body .legend,body .chartlegend{flex-shrink:0!important}
+body.overview-mode{height:auto!important;overflow-y:auto!important}
+body.overview-mode main{display:flex!important;flex-direction:column;gap:7px}
+body.overview-mode .metrics .metric{height:60px!important;padding:5px 10px!important}
+body.overview-mode .instruction-scroll{max-height:33px!important}
+body.overview-mode .layout,body.overview-mode .bottom-layout{flex:none!important;margin:0!important}
+body.overview-mode .layout .map{height:clamp(260px,34vh,380px)!important}
+body.overview-mode #ranking,body.overview-mode #demogBars{flex:0 0 auto!important;max-height:none!important;height:auto!important;overflow:visible!important}
+body.overview-mode .rank{min-height:16px!important;line-height:1.1!important;margin:0!important}
+body.overview-mode .rank .name,body.overview-mode .rank .num{font-size:12px!important}
+body.overview-mode .bottom-layout>.card{min-height:240px!important}
+body.overview-mode #trendChart{min-height:180px!important}
+body.overview-mode .demogrow{margin:3px 0!important}
+body.overview-mode .demogtop{font-size:12px!important;line-height:1.15}
+body.overview-mode .demogtrack{height:7px!important;margin-top:2px!important}
 }
