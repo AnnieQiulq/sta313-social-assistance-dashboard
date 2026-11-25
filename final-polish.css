@@ -324,3 +324,36 @@ h2 { font-size:18px; }
 
 /* Final analytical controls */
 .topcontrols{display:grid!important;grid-template-columns:minmax(220px,2fr) repeat(2,minmax(125px,.8fr)) minmax(150px,1fr) auto!important;gap:12px;align-items:end}.extra-controls{display:flex;gap:6px;flex-wrap:wrap}.rank-group{font-size:11px;font-weight:700;color:#64748b;padding:4px 7px;border-bottom:1px solid #e0e4e8}dialog{width:min(850px,90vw);max-height:88vh;overflow:auto;border:1px solid #d5dce2;border-radius:14px;padding:22px;background:#fff;color:#25303c}dialog::backdrop{background:#17233388}.dialog-head,.compare-selects{display:flex;justify-content:space-between;gap:12px;align-items:center}.compare-selects label{flex:1}.compare-selects select{display:block;width:100%;padding:8px;margin:5px 0 12px}#compareOutput table{width:100%;border-collapse:collapse;font-size:13px}#compareOutput td,#compareOutput th{padding:8px;text-align:left;border-bottom:1px solid #e0e4e8}#compareOutput svg{width:100%;max-height:300px;margin-top:12px}#methodDialog p{line-height:1.6}@media(max-width:1049px){.topcontrols{grid-template-columns:repeat(2,minmax(0,1fr))!important}.periodcontrol{grid-column:1/-1}}@media(min-width:1050px){.overview-mode .topcontrols{grid-template-columns:minmax(220px,2fr) repeat(2,minmax(125px,.8fr)) minmax(150px,1fr) auto!important}}
+
+/* Nov 25 usability review */
+.extra-controls{flex-wrap:nowrap;align-items:center}
+.extra-controls .pill,.dialog-head .pill{font:600 12px/1.2 inherit;font-family:inherit;font-size:12px;font-weight:650;padding:9px 12px;background:#25303c;color:#fff;border:1px solid #25303c;border-radius:8px;white-space:nowrap}
+.view-mode-control{min-width:0!important;justify-self:stretch!important;position:relative;padding-bottom:0}
+#modeHelp{display:none}
+.topcontrols{align-items:end!important;grid-template-columns:minmax(200px,2fr) repeat(2,minmax(120px,.8fr)) minmax(140px,.85fr) auto!important}
+.metric-instruction{justify-content:flex-start;min-height:0!important}
+.metric-instruction .instruction-heading{display:flex;justify-content:space-between;align-items:center}
+.metric-instruction .instruction-heading small{font-size:10px;color:#d9e4ec;margin:0;font-weight:400;letter-spacing:0}
+.instruction-scroll{max-height:72px;overflow-y:auto;scrollbar-width:thin;line-height:1.5;padding-right:5px}
+.instruction-scroll div{margin-bottom:4px}
+.range-wrap.annual #endYear{visibility:hidden;pointer-events:none}
+.range-wrap.annual #startYear{pointer-events:auto;z-index:5!important;cursor:pointer}
+#compareOutput table{font-size:16px!important}
+#compareOutput th,#compareOutput td{padding:10px 8px}
+#compareOutput .compare-legend{display:flex;justify-content:center;gap:24px;flex-wrap:wrap;font-size:14px}
+#methodDialog{font-size:15px;line-height:1.55}
+#methodDialog h3{font-size:17px;margin:18px 0 6px}
+#methodDialog ol{padding-left:24px;margin:6px 0}
+#methodDialog li{margin:6px 0}
+#methodDialog a{color:#365d90}
+.map #tooltip{position:fixed!important;width:340px!important;max-width:calc(100vw - 24px)!important;font-size:14px!important;line-height:1.5;padding:14px 16px;z-index:1000;pointer-events:none;box-sizing:border-box}
+#tooltip svg{display:block;width:100%;height:60px}
+@media(min-width:1050px){
+ .overview-mode .metrics .metric{height:76px!important;min-height:0!important;padding:6px 12px!important;box-sizing:border-box}
+ .overview-mode .instruction-scroll{max-height:46px}
+ .overview-mode .layout{flex:1 1 66%!important}
+ .overview-mode .bottom-layout{flex:1 1 34%!important}
+ .overview-mode .topcontrols{grid-template-columns:minmax(200px,2fr) repeat(2,minmax(120px,.8fr)) minmax(140px,.85fr) auto!important}
+ .overview-mode .map{overflow:visible!important}
+}
+@media(max-width:1049px){.topcontrols{grid-template-columns:repeat(2,minmax(0,1fr))!important}.extra-controls{flex-wrap:wrap}}
