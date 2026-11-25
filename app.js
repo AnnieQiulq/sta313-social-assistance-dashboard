@@ -6,14 +6,15 @@ const CODES={'Toronto':535,'Hamilton':537,'Ottawa–Gatineau (Ont. part)':505,'K
 function rec(c,year){return DATA[CODES[c[0]]+'-'+year]}
 function rate(c,year,prog=program){let d=rec(c,year);if(!d)return NaN;let cases=prog==='both'?d.ow.cases+d.odsp.cases:d[prog].cases;return 1000*cases/d.population}
 function change(c){const a=rate(c,startYear),b=rate(c,endYear);return a?100*(b-a)/a:NaN}
-function color(v){return v>=30?'#963d20':v>=15?'#c8754e':v>=5?'#e5b49a':v>-5?'#d9d6cf':v>-15?'#9db7d4':v>-30?'#527ba9':'#25456d'}
+function color(v){const a=endYear-startYear===1?0.5:2,b=endYear-startYear===1?3:15;return v>=b?'#963d20':v>=a?'#e5b49a':v<=-b?'#25456d':v<=-a?'#9db7d4':'#d9d6cf'}
+function updateLegend(){const a=endYear-startYear===1?0.5:2,b=endYear-startYear===1?3:15;document.querySelector('.legend').innerHTML='<strong>Colour = % change</strong>'+[['#25456d','≤ −'+b+'%'],['#9db7d4','−'+b+' to −'+a+'%'],['#d9d6cf','Within ±'+a+'%'],['#e5b49a','+'+a+' to +'+b+'%'],['#963d20','≥ +'+b+'%']].map(([c,t])=>'<span><i class="swatch" style="background:'+c+'"></i>'+t+'</span>').join('')+'<span>· '+(endYear-startYear===1?'Annual scale':'Multi-year scale')+'</span>'}
 function rankOf(c,year){return 1+CMA.filter(x=>rate(x,year)>rate(c,year)).length}
 function cases(c,y){const d=rec(c,y);return program==='both'?d.ow.cases+d.odsp.cases:d[program].cases}
 function fmt(v){return (v>0?'+':'')+v.toFixed(1)+'%'}
 function node(tag,attrs){let e=document.createElementNS(ns,tag);for(let [k,v] of Object.entries(attrs))e.setAttribute(k,v);return e}
 function select(c){selected=c[0];render();renderBottom();document.getElementById('status').innerHTML='<strong>Selected:</strong> '+c[0]+' · Real '+startYear+' rate: '+rate(c,startYear).toFixed(1)+' · '+endYear+' rate: '+rate(c,endYear).toFixed(1)+' per 1,000 · Change: '+fmt(change(c))}
 function sparkline(c){let vals=Array.from({length:endYear-startYear+1},(_,i)=>rate(c,startYear+i));let lo=Math.min(...vals),hi=Math.max(...vals),spread=hi-lo||1;let pts=vals.map((v,i)=>[8+i*182/Math.max(1,vals.length-1),38-(v-lo)/spread*28]);return '<svg viewBox="0 0 200 50" width="200" height="50"><polyline points="'+pts.map(p=>p.join(',')).join(' ')+'" fill="none" stroke="#e9a875" stroke-width="2"/></svg>'}
-function showTip(e,c){const ra=rankOf(c,startYear),rb=rankOf(c,endYear),rankArrow=rb>ra?' ↓':rb<ra?' ↑':' →';tip.style.display='block';const r1=rate(c,startYear),r2=rate(c,endYear);tip.innerHTML='<strong>'+c[0]+'</strong><div>Rate per 1,000, '+startYear+' → '+endYear+': '+r1.toFixed(1)+' → '+r2.toFixed(1)+'</div>'+sparkline(c)+'<div>Change: '+fmt(change(c))+'</div><div>Annual-average cases: '+Math.round(cases(c,startYear)).toLocaleString()+' → '+Math.round(cases(c,endYear)).toLocaleString()+'</div><div>Rate rank (highest = 1): '+ra+' → '+rb+rankArrow+'</div><div>Program: '+(program==='both'?'OW + ODSP':program.toUpperCase())+'</div><small>Click to update charts</small>';tip.style.left=Math.max(8,Math.min(e.clientX+16,window.innerWidth-tip.offsetWidth-8))+'px';tip.style.top=Math.max(8,Math.min(e.clientY+16,window.innerHeight-tip.offsetHeight-8))+'px'}
+function showTip(e,c){const ra=rankOf(c,startYear),rb=rankOf(c,endYear),rankArrow=rb>ra?' ↓':rb<ra?' ↑':' →';tip.style.display='block';const r1=rate(c,startYear),r2=rate(c,endYear);tip.innerHTML='<strong>'+c[0]+'</strong><div>Rate per 1,000, '+startYear+' → '+endYear+': '+r1.toFixed(1)+' → '+r2.toFixed(1)+'</div>'+sparkline(c)+'<div class="tip-change">Change: '+fmt(change(c))+'</div><div>Annual-average cases: '+Math.round(cases(c,startYear)).toLocaleString()+' → '+Math.round(cases(c,endYear)).toLocaleString()+'</div><div>Rate rank (highest = 1): '+ra+' → '+rb+rankArrow+'</div><div>Program: '+(program==='both'?'OW + ODSP':program.toUpperCase())+'</div><small>Click to update charts</small>';tip.style.left=Math.max(8,Math.min(e.clientX+16,window.innerWidth-tip.offsetWidth-8))+'px';tip.style.top=Math.max(8,Math.min(e.clientY+16,window.innerHeight-tip.offsetHeight-8))+'px'}
 let GEO=null, CONTEXT=null, FULL_ONTARIO=null;
 const geoByCode=new Map();
 function renderMap(){
@@ -171,7 +172,7 @@ function renderThunderInset(){
   .text(d=>d.text).style('pointer-events','none');
 }
 
-function render(){document.getElementById('mapPeriod').textContent=startYear+'–'+endYear;
+function render(){updateLegend();document.getElementById('mapPeriod').textContent=startYear+'–'+endYear;
  document.getElementById('mapDescription').textContent='% change in '+(program==='both'?'OW + ODSP':program.toUpperCase())+' rate per 1,000 residents, '+startYear+' → '+endYear;
  document.getElementById('rankingSubtitle').textContent='% change in '+(program==='both'?'OW + ODSP':program.toUpperCase())+' rate per 1,000 residents, '+startYear+' → '+endYear+' · Bars extend from zero; lengths share one scale.';
  renderMap();updateReadout();
