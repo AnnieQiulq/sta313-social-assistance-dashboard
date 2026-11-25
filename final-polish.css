@@ -398,3 +398,10 @@ body.overview-mode .demogrow{margin:3px 0!important}
 body.overview-mode .demogtop{font-size:12px!important;line-height:1.15}
 body.overview-mode .demogtrack{height:7px!important;margin-top:2px!important}
 }
+
+/* Native draggable instruction scrollbar: remove tiny arrow buttons. */
+body .metric-instruction .instruction-scroll{overflow-y:scroll!important;scrollbar-width:auto;scrollbar-color:auto;pointer-events:auto;min-height:0;position:relative;z-index:1;scrollbar-gutter:stable}
+body .instruction-scroll::-webkit-scrollbar{width:13px}
+body .instruction-scroll::-webkit-scrollbar-track{background:#34404c;border-radius:8px}
+body .instruction-scroll::-webkit-scrollbar-thumb{background:#aeb9c4;border:2px solid #34404c;border-radius:8px;min-height:18px}
+body .instruction-scroll::-webkit-scrollbar-button{display:none;width:0;height:0}
