@@ -367,3 +367,22 @@ body:not(.overview-mode) .rank .name,body:not(.overview-mode) .rank .num{font-si
 /* Consistent encoding and independent overview columns */
 body:not(.overview-mode) .ranking{max-height:540px;overflow-y:auto}body:not(.overview-mode) .rank{min-height:30px!important}body:not(.overview-mode) .note,body:not(.overview-mode) .policy-readout p,body:not(.overview-mode) .metric small{font-size:14px!important}body:not(.overview-mode) .mapmetadata{font-size:12px!important}.instruction-scroll{max-height:105px}.overview-mode .instruction-scroll{max-height:64px!important;overflow-y:auto!important}.overview-mode .note,.overview-mode .policy-readout p,.overview-mode .metric small{font-size:12px!important}.overview-mode .legend{font-size:11px!important}
 @media(min-width:1050px){.overview-mode main{display:grid!important;grid-template-columns:minmax(0,1.35fr) minmax(350px,1fr);grid-template-rows:auto auto minmax(0,1fr) minmax(0,0.38fr) minmax(0,0.85fr);gap:7px 8px}.overview-mode header,.overview-mode .metrics{grid-column:1/-1;margin:0!important}.overview-mode .layout,.overview-mode .bottom-layout{display:contents!important}.overview-mode .layout>section{grid-column:1;grid-row:3/5}.overview-mode .layout>aside{grid-column:2;grid-row:3}.overview-mode .bottom-layout>section:first-child{grid-column:1;grid-row:5}.overview-mode .bottom-layout>section:last-child{grid-column:2;grid-row:4/6}.overview-mode .ranking{flex:1 1 auto;min-height:0}.overview-mode .policy-readout{margin-top:2px!important}.overview-mode .rank{min-height:15px!important}.overview-mode .metric{height:88px!important}.overview-mode #demogBars{min-height:0;overflow-y:auto}.overview-mode .demogrow{margin:2px 0!important}}
+
+/* Layout review: keep captions visible and avoid nested overview scrolling */
+@media(min-width:1050px){
+ body:not(.overview-mode) .layout{align-items:stretch!important}
+ body:not(.overview-mode) .layout .map{height:clamp(280px,calc(100vh - 505px),470px)!important;aspect-ratio:auto!important;min-height:0!important}
+ body:not(.overview-mode) .layout .map>svg#svg{height:100%!important;width:100%!important;aspect-ratio:auto!important}
+ body:not(.overview-mode) .ranking{max-height:clamp(190px,calc(100vh - 560px),390px)!important;overflow-y:auto!important}
+ body:not(.overview-mode) .bottom-layout{align-items:start!important}
+ body:not(.overview-mode) #demogBars{min-height:0!important;max-height:340px;overflow-y:auto}
+ body.overview-mode{height:auto!important;min-height:100vh;overflow-y:auto!important}
+ .overview-mode main{height:auto!important;min-height:calc(100vh - 20px);grid-template-rows:auto auto minmax(310px,auto) minmax(70px,auto) minmax(230px,auto)!important}
+ .overview-mode .layout>section .map{min-height:280px!important}
+ .overview-mode .ranking,.overview-mode #demogBars{flex:0 0 auto!important;max-height:none!important;overflow:visible!important;height:auto!important}
+ .overview-mode .rank{min-height:16px!important;line-height:1.1!important;margin:0!important}
+ .overview-mode .rank .name,.overview-mode .rank .num{font-size:12px!important}
+ .overview-mode .demogrow{margin:3px 0!important}.overview-mode .demogtop{font-size:12px!important;line-height:1.15}.overview-mode .demogtrack{height:7px!important;margin-top:2px!important}
+ .overview-mode .policy-readout{margin-top:6px!important}.overview-mode #trendChart{min-height:145px!important}
+ .overview-mode .card{overflow:visible!important}.overview-mode .card>.note,.overview-mode .legend{flex-shrink:0!important}
+}
