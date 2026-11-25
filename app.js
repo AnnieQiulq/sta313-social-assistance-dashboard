@@ -173,10 +173,10 @@ function renderThunderInset(){
 }
 
 function render(){updateLegend();document.getElementById('mapPeriod').textContent=startYear+'–'+endYear;
- document.getElementById('mapDescription').textContent='% change in '+(program==='both'?'OW + ODSP':program.toUpperCase())+' rate per 1,000 residents, '+startYear+' → '+endYear;
- document.getElementById('rankingSubtitle').textContent='% change in '+(program==='both'?'OW + ODSP':program.toUpperCase())+' rate per 1,000 residents, '+startYear+' → '+endYear+' · Bars extend from zero; lengths share one scale.';
+ document.getElementById('mapDescription').textContent='% change in '+(program==='both'?'OW + ODSP':program.toUpperCase())+' cases per 1,000 residents, '+startYear+'–'+endYear;
+ document.getElementById('rankingSubtitle').textContent='% change in '+(program==='both'?'OW + ODSP':program.toUpperCase())+' caseload rate per 1,000 residents, '+startYear+'–'+endYear+'.';
  renderMap();updateReadout();
- const rank=document.getElementById('ranking');rank.replaceChildren();const scale=Math.max(5,Math.ceil(Math.max(...CMA.map(c=>Math.abs(change(c))).filter(Number.isFinite))/5)*5);document.getElementById('rankingSubtitle').textContent+=' Range: −'+scale+'% to +'+scale+'% (selected period).';const focus=new Set(['Toronto','Hamilton','Oshawa','Barrie','Guelph','Brantford','Kitchener–Cambridge–Waterloo','St. Catharines–Niagara','Peterborough']);let lastGroup='';
+ const rank=document.getElementById('ranking');rank.replaceChildren();const scale=Math.max(5,Math.ceil(Math.max(...CMA.map(c=>Math.abs(change(c))).filter(Number.isFinite))/5)*5);document.getElementById('rankingSubtitle').textContent+=' Bar scale: ±'+scale+'% (selected period).';const focus=new Set(['Toronto','Hamilton','Oshawa','Barrie','Guelph','Brantford','Kitchener–Cambridge–Waterloo','St. Catharines–Niagara','Peterborough']);let lastGroup='';
  for(let c of [...CMA].sort((a,b)=>(zoom==='all'?0:Number(focus.has(b[0]))-Number(focus.has(a[0])))||change(b)-change(a))){const group=focus.has(c[0])?'Map focus CMAs':'Other CMAs';if(zoom!=='all'&&group!==lastGroup){const h=document.createElement('div');h.className='rank-group';h.textContent=group;rank.append(h);lastGroup=group}let v=change(c),b=document.createElement('button');b.className='rank'+(selected===c[0]?' selected':'');b.innerHTML='<span class="name" title="'+c[0]+'">'+c[1]+'</span><span class="bartrack"><span class="bar" style="left:'+(v>=0?50:50-48*Math.abs(v)/scale)+'%;width:'+48*Math.abs(v)/scale+'%;background:'+color(v)+'"></span></span><span class="num">'+fmt(v)+'</span>';b.onclick=()=>select(c);rank.append(b)}
 }
 function updateReadout(){
