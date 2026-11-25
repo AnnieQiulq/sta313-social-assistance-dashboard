@@ -7,11 +7,13 @@ function rec(c,year){return DATA[CODES[c[0]]+'-'+year]}
 function rate(c,year,prog=program){let d=rec(c,year);if(!d)return NaN;let cases=prog==='both'?d.ow.cases+d.odsp.cases:d[prog].cases;return 1000*cases/d.population}
 function change(c){const a=rate(c,startYear),b=rate(c,endYear);return a?100*(b-a)/a:NaN}
 function color(v){return v>=15?'#ad4d2d':v>=5?'#e0a07d':v>-5?'#d9d6cf':v>-15?'#8fb0d3':'#365d90'}
+function rankOf(c,year){return 1+CMA.filter(x=>rate(x,year)>rate(c,year)).length}
+function cases(c,y){const d=rec(c,y);return program==='both'?d.ow.cases+d.odsp.cases:d[program].cases}
 function fmt(v){return (v>0?'+':'')+v.toFixed(1)+'%'}
 function node(tag,attrs){let e=document.createElementNS(ns,tag);for(let [k,v] of Object.entries(attrs))e.setAttribute(k,v);return e}
 function select(c){selected=c[0];render();renderBottom();document.getElementById('status').innerHTML='<strong>Selected:</strong> '+c[0]+' · Real '+startYear+' rate: '+rate(c,startYear).toFixed(1)+' · '+endYear+' rate: '+rate(c,endYear).toFixed(1)+' per 1,000 · Change: '+fmt(change(c))}
 function sparkline(c){let vals=Array.from({length:endYear-startYear+1},(_,i)=>rate(c,startYear+i));let lo=Math.min(...vals),hi=Math.max(...vals),spread=hi-lo||1;let pts=vals.map((v,i)=>[8+i*182/Math.max(1,vals.length-1),38-(v-lo)/spread*28]);return '<svg viewBox="0 0 200 50" width="200" height="50"><polyline points="'+pts.map(p=>p.join(',')).join(' ')+'" fill="none" stroke="#e9a875" stroke-width="2"/></svg>'}
-function showTip(e,c){tip.style.display='block';const r1=rate(c,startYear),r2=rate(c,endYear);tip.innerHTML='<strong>'+c[0]+'</strong><div>Rate per 1,000, '+startYear+' → '+endYear+': '+r1.toFixed(1)+' → '+r2.toFixed(1)+'</div>'+sparkline(c)+'<div>Change: '+fmt(change(c))+'</div><div>Program: '+(program==='both'?'OW + ODSP':program.toUpperCase())+'</div><small>Click to update charts</small>';let rect=document.getElementById('map').getBoundingClientRect();const insetHover=false;if(insetHover){const insetRect=document.querySelector('.northern-panel').getBoundingClientRect();tip.style.position='fixed';tip.style.left=Math.max(8,insetRect.left-285)+'px';tip.style.top=Math.max(8,Math.min(insetRect.top,window.innerHeight-tip.offsetHeight-8))+'px'}else{tip.style.position='absolute';tip.style.left=Math.max(10,Math.min(e.clientX-rect.left+12,rect.width-285))+'px';tip.style.top=Math.max(10,Math.min(e.clientY-rect.top+12,rect.height-245))+'px'}}
+function showTip(e,c){tip.style.display='block';const r1=rate(c,startYear),r2=rate(c,endYear);tip.innerHTML='<strong>'+c[0]+'</strong><div>Rate per 1,000, '+startYear+' → '+endYear+': '+r1.toFixed(1)+' → '+r2.toFixed(1)+'</div>'+sparkline(c)+'<div>Change: '+fmt(change(c))+'</div><div>Annual-average cases: '+Math.round(cases(c,startYear)).toLocaleString()+' → '+Math.round(cases(c,endYear)).toLocaleString()+'</div><div>Rate rank (highest = 1): '+rankOf(c,startYear)+' → '+rankOf(c,endYear)+'</div><div>Program: '+(program==='both'?'OW + ODSP':program.toUpperCase())+'</div><small>Click to update charts</small>';let rect=document.getElementById('map').getBoundingClientRect();const insetHover=false;if(insetHover){const insetRect=document.querySelector('.northern-panel').getBoundingClientRect();tip.style.position='fixed';tip.style.left=Math.max(8,insetRect.left-285)+'px';tip.style.top=Math.max(8,Math.min(insetRect.top,window.innerHeight-tip.offsetHeight-8))+'px'}else{tip.style.position='absolute';tip.style.left=Math.max(10,Math.min(e.clientX-rect.left+12,rect.width-285))+'px';tip.style.top=Math.max(10,Math.min(e.clientY-rect.top+12,rect.height-245))+'px'}}
 let GEO=null, CONTEXT=null, FULL_ONTARIO=null;
 const geoByCode=new Map();
 function renderMap(){
@@ -173,8 +175,8 @@ function render(){document.getElementById('mapPeriod').textContent=startYear+'�
  document.getElementById('mapDescription').textContent='% change in '+(program==='both'?'OW + ODSP':program.toUpperCase())+' rate per 1,000 residents, '+startYear+' → '+endYear;
  document.getElementById('rankingSubtitle').textContent='% change in '+(program==='both'?'OW + ODSP':program.toUpperCase())+' rate per 1,000, '+startYear+' → '+endYear;
  renderMap();updateReadout();
- const rank=document.getElementById('ranking');rank.replaceChildren();
- for(let c of [...CMA].sort((a,b)=>change(b)-change(a))){let v=change(c),b=document.createElement('button');b.className='rank'+(selected===c[0]?' selected':'');b.innerHTML='<span class="name" title="'+c[0]+'">'+c[1]+'</span><span class="bartrack"><span class="bar" style="left:'+(v>=0?50:50-Math.min(48,Math.abs(v)*1.3))+'%;width:'+Math.min(48,Math.abs(v)*1.3)+'%;background:'+color(v)+'"></span></span><span class="num">'+fmt(v)+'</span>';b.onclick=()=>select(c);rank.append(b)}
+ const rank=document.getElementById('ranking');rank.replaceChildren();const scale=Math.max(1,...CMA.map(c=>Math.abs(change(c))));const focus=new Set(['Toronto','Hamilton','Oshawa','Barrie','Guelph','Brantford','Kitchener–Cambridge–Waterloo','St. Catharines–Niagara','Peterborough']);let lastGroup='';
+ for(let c of [...CMA].sort((a,b)=>(zoom==='all'?0:Number(focus.has(b[0]))-Number(focus.has(a[0])))||change(b)-change(a))){const group=focus.has(c[0])?'Map focus CMAs':'Other CMAs';if(zoom!=='all'&&group!==lastGroup){const h=document.createElement('div');h.className='rank-group';h.textContent=group;rank.append(h);lastGroup=group}let v=change(c),b=document.createElement('button');b.className='rank'+(selected===c[0]?' selected':'');b.innerHTML='<span class="name" title="'+c[0]+'">'+c[1]+'</span><span class="bartrack"><span class="bar" style="left:'+(v>=0?50:50-48*Math.abs(v)/scale)+'%;width:'+48*Math.abs(v)/scale+'%;background:'+color(v)+'"></span></span><span class="num">'+fmt(v)+'</span>';b.onclick=()=>select(c);rank.append(b)}
 }
 function updateReadout(){
  const c=CMA.find(x=>x[0]===selected);if(!c||!DATA||!rec(c,startYear))return;
@@ -182,7 +184,7 @@ function updateReadout(){
  const sorted=[...CMA].sort((x,y)=>change(y)-change(x));const rank=sorted.findIndex(x=>x[0]===selected)+1;
  const label=program==='both'?'OW and ODSP combined':program==='ow'?'Ontario Works':'ODSP';
  document.getElementById('readoutTitle').textContent=c[0]+' · '+(v>=0?'+' : '')+v.toFixed(1)+'%';
- document.getElementById('readoutBody').textContent=label+' caseload rate changed from '+a.toFixed(1)+' to '+b.toFixed(1)+' cases per 1,000 residents between '+startYear+' and '+endYear+'. Ranked '+rank+' of 15 CMAs by rate growth. Click another CMA to compare its pattern.';
+ document.getElementById('readoutBody').textContent=label+' caseload rate changed from '+a.toFixed(1)+' to '+b.toFixed(1)+' cases per 1,000 residents between '+startYear+' and '+endYear+'. Ranked '+rank+' of 15 CMAs by rate growth. Use Compare CMAs for a side-by-side comparison.';
 }
 function setMode(mode){
  const isOverview=mode==='overview';
@@ -206,8 +208,8 @@ function renderBottom(){
  const total=years.map(y=>rate(c,y,'both')),ow=years.map(y=>rate(c,y,'ow')),odsp=years.map(y=>rate(c,y,'odsp'));
  const max=Math.max(...total)*1.15,x=i=>48+i*32,y=v=>245-v/max*205;
  s.replaceChildren();const add=(tag,attrs,text)=>{const el=node(tag,attrs);if(text!==undefined)el.textContent=text;s.append(el);return el};
- add('rect',{x:x(14),y:24,width:x(16)-x(14),height:221,fill:'#cbb79b',opacity:0.14});
- add('text',{x:(x(14)+x(16))/2,y:17,'text-anchor':'middle',fill:'#907e6b','font-size':10},'COVID-19');
+ add('rect',{x:x(15),y:24,width:x(16)-x(15),height:221,fill:'#cbb79b',opacity:0.14});
+ add('text',{x:(x(15)+x(16))/2,y:17,'text-anchor':'middle',fill:'#907e6b','font-size':10},'COVID-19');
  for(let k=0;k<=4;k++){let yy=245-k*51;add('line',{x1:48,y1:yy,x2:710,y2:yy,stroke:'#d9e0e6'});add('text',{x:37,y:yy+4,'text-anchor':'end',fill:'#657586','font-size':10},(max*k/4).toFixed(0))}
  for(let yr of [2005,2010,2015,2020,2025])add('text',{x:x(yr-2005),y:270,'text-anchor':'middle',fill:'#657586','font-size':11},yr);
  for(let [values,clr,which] of [[total,'#25303c','both'],[ow,'#41838b','ow'],[odsp,'#8c5bb7','odsp']])add('path',{d:values.map((v,i)=>(i?'L':'M')+x(i)+','+y(v)).join(' '),fill:'none',stroke:clr,'stroke-width':program===which||program==='both'?3:1.5,opacity:program==='both'||program===which?1:.24,'stroke-linecap':'round','stroke-linejoin':'round'});
@@ -222,9 +224,9 @@ function renderBottom(){
  document.getElementById('demogCaption').textContent=c[0]+' · '+startYear+' → '+endYear+' · '+(program==='both'?'OW + ODSP':program.toUpperCase())+' · contributions to change in annual-average cases (% of starting cases)';
  const barsFor=(which,rows)=>{
    const denom=which==='both'?a.ow.cases+a.odsp.cases:a[which].cases;
-   return rows.map(([name,k])=>{let va=which==='both'?a.ow[k]+a.odsp[k]:a[which][k],vb=which==='both'?b.ow[k]+b.odsp[k]:b[which][k];
+   const scale=Math.max(1,...rows.map(([name,k])=>Math.abs(( (which==='both'?b.ow[k]+b.odsp[k]:b[which][k])-(which==='both'?a.ow[k]+a.odsp[k]:a[which][k]))/denom*100)).filter(Number.isFinite));return rows.map(([name,k])=>{let va=which==='both'?a.ow[k]+a.odsp[k]:a[which][k],vb=which==='both'?b.ow[k]+b.odsp[k]:b[which][k];
     let v=(vb-va)/denom*100;if(!Number.isFinite(v))return `<p class="note">${name}: data unavailable</p>`;
-    return `<div class="demogrow"><div class="demogtop"><span>${name}</span><span>${fmt(v)}</span></div><div class="demogtrack"><div class="demogfill" style="left:${v>=0?50:50-Math.min(48,Math.abs(v)*.8)}%;width:${Math.min(48,Math.abs(v)*.8)}%;background:${color(v)}"></div></div></div>`}).join('');
+    return `<div class="demogrow"><div class="demogtop"><span>${name}</span><span>${fmt(v)}</span></div><div class="demogtrack"><div class="demogfill" style="left:${v>=0?50:50-48*Math.abs(v)/scale}%;width:${48*Math.abs(v)/scale}%;background:${color(v)}"></div></div></div>`}).join('');
  };
  let html='';
  if(demographicMode==='duration'&&program==='both'){
@@ -237,7 +239,7 @@ function renderBottom(){
 }
 for(let [id,mode] of [['householdBtn','household'],['ageBtn','age'],['durationBtn','duration']])document.getElementById(id).onclick=()=>{demographicMode=mode;renderBottom()};
 function updateControls(){
- let a=+document.getElementById('startYear').value,b=+document.getElementById('endYear').value;
+ let a=+document.getElementById('startYear').value,b=+document.getElementById('endYear').value;if(document.getElementById('periodMode')?.value==='annual'){a=Math.min(a,2024);b=a+1}
  if(a>=b){if(document.activeElement.id==='startYear')a=Math.max(2005,b-1);else b=Math.min(2025,a+1)}
  startYear=a;endYear=b;
  document.getElementById('startYear').value=a;document.getElementById('endYear').value=b;
@@ -245,8 +247,12 @@ function updateControls(){
  document.getElementById('rangeFill').style.left=((a-2005)/20*100)+'%';document.getElementById('rangeFill').style.right=(100-(b-2005)/20*100)+'%';
  document.getElementById('startYear').style.zIndex=document.activeElement.id==='startYear'?'3':'2';document.getElementById('endYear').style.zIndex=document.activeElement.id==='endYear'?'3':'2';
  program=document.getElementById('programSelect').value;
- render();renderBottom();updateMetrics();
+ render();renderBottom();updateMetrics();updateStatus();
 }
 for(let id of ['startYear','endYear','programSelect'])document.getElementById(id).addEventListener('input',updateControls);
 Promise.all([d3.json('real_data.json'),d3.json('ontario_15_cma_boundaries.geojson'),d3.json('ontario_context.geojson')]).then(([d,g,context])=>{DATA=d;GEO=g;CONTEXT=context;for(const f of g.features)geoByCode.set(String(f.properties.CMAUID),f);render();renderBottom();updateMetrics();select(CMA.find(c=>c[0]===selected))}).catch(err=>{document.getElementById('status').textContent='Could not load data or boundaries. Use Live Server and check internet for D3. '+err.message;console.error(err)});
-function updateMetrics(){const sorted=[...CMA].sort((a,b)=>change(b)-change(a));const count=sorted.filter(c=>change(c)>0).length;document.getElementById('countMetric').textContent=count+' of 15';document.getElementById('riseMetric').textContent=fmt(change(sorted[0]));document.getElementById('riseName').textContent='Largest increase: '+sorted[0][0];document.getElementById('fallMetric').textContent=fmt(change(sorted.at(-1)));document.getElementById('fallName').textContent='Largest decrease: '+sorted.at(-1)[0]}
+function updateStatus(){const c=CMA.find(x=>x[0]===selected);document.getElementById('status').textContent='Selected: '+c[0]+' · '+startYear+' → '+endYear+' · '+rate(c,startYear).toFixed(1)+' → '+rate(c,endYear).toFixed(1)+' cases per 1,000 ('+fmt(change(c))+')'}
+function updateMetrics(){const sorted=[...CMA].sort((a,b)=>change(b)-change(a));const count=sorted.filter(c=>change(c)>0).length;document.getElementById('countMetric').textContent=count+' of 15';document.getElementById('riseMetric').textContent=fmt(change(sorted[0]));document.getElementById('riseName').textContent='Highest rate change: '+sorted[0][0];document.getElementById('fallMetric').textContent=fmt(change(sorted.at(-1)));document.getElementById('fallName').textContent='Lowest rate change: '+sorted.at(-1)[0]}
+
+function setupExtras(){const mode=document.getElementById('periodMode');if(!mode)return;mode.onchange=()=>{document.getElementById('endYear').disabled=mode.value==='annual';updateControls()};const dialog=document.getElementById('compareDialog'),a=document.getElementById('compareA'),b=document.getElementById('compareB');for(const el of [a,b])for(const c of CMA){const opt=document.createElement('option');opt.value=c[0];opt.textContent=c[0];el.append(opt)}function draw(){const cs=[a,b].map(el=>CMA.find(c=>c[0]===el.value));const out=document.getElementById('compareOutput');out.replaceChildren();const table=document.createElement('table');const rows=[['Measure',...cs.map(c=>c[0])],['Starting rate',...cs.map(c=>rate(c,startYear).toFixed(1))],['Ending rate',...cs.map(c=>rate(c,endYear).toFixed(1))],['Rate change',...cs.map(c=>fmt(change(c)))],['Rate rank (start → end)',...cs.map(c=>rankOf(c,startYear)+' → '+rankOf(c,endYear))],['Annual-average cases (start → end)',...cs.map(c=>Math.round(cases(c,startYear)).toLocaleString()+' → '+Math.round(cases(c,endYear)).toLocaleString())]];for(const [i,row] of rows.entries()){const tr=table.insertRow();for(const v of row){const td=document.createElement(i===0?'th':'td');td.textContent=v;tr.append(td)}}out.append(table);const chart=node('svg',{viewBox:'0 0 640 230',role:'img','aria-label':'Comparison of historical caseload rates'});const vals=cs.map(c=>Array.from({length:21},(_,i)=>rate(c,2005+i)));const max=Math.max(1,...vals.flat())*1.1;for(let i=0;i<=4;i++){const y=190-i*42;chart.append(node('line',{x1:45,x2:620,y1:y,y2:y,stroke:'#d9e0e6'}));const t=node('text',{x:40,y:y+4,'text-anchor':'end','font-size':11});t.textContent=(max*i/4).toFixed(1);chart.append(t)}for(let i=0;i<2;i++){chart.append(node('polyline',{points:vals[i].map((v,j)=>(45+j*28.75)+','+(190-v/max*168)).join(' '),fill:'none',stroke:i?'#ad4d2d':'#365d90','stroke-width':3}));const t=node('text',{x:45+i*290,y:220,fill:i?'#ad4d2d':'#365d90','font-size':11});t.textContent=cs[i][0];chart.append(t)}for(const yr of [2005,2010,2015,2020,2025]){const t=node('text',{x:45+(yr-2005)*28.75,y:205,'text-anchor':'middle','font-size':11});t.textContent=yr;chart.append(t)}out.append(chart)}a.onchange=b.onchange=draw;document.getElementById('compareOpen').onclick=()=>{if(!GEO)return;a.value=selected;b.value=CMA.find(c=>c[0]!==selected)[0];document.getElementById('comparePeriod').textContent=startYear+'–'+endYear+' · '+program.toUpperCase()+' · rates per 1,000 residents';draw();dialog.showModal()};document.getElementById('compareClose').onclick=()=>dialog.close();document.getElementById('methodOpen').onclick=()=>document.getElementById('methodDialog').showModal();document.getElementById('methodClose').onclick=()=>document.getElementById('methodDialog').close()}
+setupExtras();
