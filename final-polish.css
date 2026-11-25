@@ -386,3 +386,5 @@ body:not(.overview-mode) .ranking{max-height:540px;overflow-y:auto}body:not(.ove
  .overview-mode .policy-readout{margin-top:6px!important}.overview-mode #trendChart{min-height:145px!important}
  .overview-mode .card{overflow:visible!important}.overview-mode .card>.note,.overview-mode .legend{flex-shrink:0!important}
 }
+
+@media(min-width:1050px){body:not(.overview-mode) .layout{align-items:start!important}body:not(.overview-mode) .metrics .metric{min-height:94px!important;padding:12px 16px!important}body:not(.overview-mode) header{margin-bottom:10px!important}body:not(.overview-mode) .layout .map{height:clamp(250px,calc(100vh - 565px),430px)!important}body:not(.overview-mode) #ranking{max-height:clamp(170px,calc(100vh - 630px),350px)!important;min-height:0!important;overflow-y:auto!important;flex:0 1 auto!important}body:not(.overview-mode) .layout>aside{min-height:0!important;height:auto!important}body:not(.overview-mode) .layout>section{min-height:0!important;height:auto!important}}
