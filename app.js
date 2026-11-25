@@ -6,8 +6,8 @@ const CODES={'Toronto':535,'Hamilton':537,'Ottawa–Gatineau (Ont. part)':505,'K
 function rec(c,year){return DATA[CODES[c[0]]+'-'+year]}
 function rate(c,year,prog=program){let d=rec(c,year);if(!d)return NaN;let cases=prog==='both'?d.ow.cases+d.odsp.cases:d[prog].cases;return 1000*cases/d.population}
 function change(c){const a=rate(c,startYear),b=rate(c,endYear);return a?100*(b-a)/a:NaN}
-function color(v){const a=1,b=10;return v>=b?'#963d20':v>=a?'#e5b49a':v<=-b?'#25456d':v<=-a?'#9db7d4':'#d9d6cf'}
-function updateLegend(){const a=1,b=10;document.querySelector('.legend').innerHTML='<strong>Colour = % change</strong>'+[['#25456d','≤ −'+b+'%'],['#9db7d4','−'+b+' to −'+a+'% (exclusive)'],['#d9d6cf','Within ±'+a+'% (exclusive)'],['#e5b49a','+'+a+' to +'+b+'% (upper exclusive)'],['#963d20','≥ +'+b+'%']].map(([c,t])=>'<span><i class="swatch" style="background:'+c+'"></i>'+t+'</span>').join('')+'<strong class="scale-label">'+'Fixed colour scale'+'</strong>'}
+function color(v){const a=5,b=15;return v>=b?'#963d20':v>=a?'#e5b49a':v<=-b?'#25456d':v<=-a?'#9db7d4':'#d9d6cf'}
+function updateLegend(){document.querySelector('.legend').innerHTML='<strong>Colour = % change</strong>'+[['#25456d','≤ −15%'],['#9db7d4','−15 to −5%'],['#d9d6cf','−5 to +5%'],['#e5b49a','+5 to +15%'],['#963d20','≥ +15%']].map(([c,t])=>'<span><i class="swatch" style="background:'+c+'"></i>'+t+'</span>').join('')}
 function rankOf(c,year){return 1+CMA.filter(x=>rate(x,year)>rate(c,year)).length}
 function cases(c,y){const d=rec(c,y);return program==='both'?d.ow.cases+d.odsp.cases:d[program].cases}
 function fmt(v){return (v>0?'+':'')+v.toFixed(1)+'%'}
@@ -176,7 +176,7 @@ function render(){updateLegend();document.getElementById('mapPeriod').textConten
  document.getElementById('mapDescription').textContent='% change in '+(program==='both'?'OW + ODSP':program.toUpperCase())+' rate per 1,000 residents, '+startYear+' → '+endYear;
  document.getElementById('rankingSubtitle').textContent='% change in '+(program==='both'?'OW + ODSP':program.toUpperCase())+' rate per 1,000 residents, '+startYear+' → '+endYear+' · Bars extend from zero; lengths share one scale.';
  renderMap();updateReadout();
- const rank=document.getElementById('ranking');rank.replaceChildren();const scale=Math.max(10,Math.ceil(Math.max(...CMA.flatMap(c=>['ow','odsp','both'].flatMap(p=>Array.from({length:21},(_,i)=>rate(c,2005+i,p)).flatMap((v,i,arr)=>v>0?arr.slice(i+1).map(w=>Math.abs(100*(w-v)/v)):[]))).filter(Number.isFinite))/10)*10);const focus=new Set(['Toronto','Hamilton','Oshawa','Barrie','Guelph','Brantford','Kitchener–Cambridge–Waterloo','St. Catharines–Niagara','Peterborough']);let lastGroup='';
+ const rank=document.getElementById('ranking');rank.replaceChildren();const scale=Math.max(5,Math.ceil(Math.max(...CMA.map(c=>Math.abs(change(c))).filter(Number.isFinite))/5)*5);document.getElementById('rankingSubtitle').textContent+=' Range: −'+scale+'% to +'+scale+'% (selected period).';const focus=new Set(['Toronto','Hamilton','Oshawa','Barrie','Guelph','Brantford','Kitchener–Cambridge–Waterloo','St. Catharines–Niagara','Peterborough']);let lastGroup='';
  for(let c of [...CMA].sort((a,b)=>(zoom==='all'?0:Number(focus.has(b[0]))-Number(focus.has(a[0])))||change(b)-change(a))){const group=focus.has(c[0])?'Map focus CMAs':'Other CMAs';if(zoom!=='all'&&group!==lastGroup){const h=document.createElement('div');h.className='rank-group';h.textContent=group;rank.append(h);lastGroup=group}let v=change(c),b=document.createElement('button');b.className='rank'+(selected===c[0]?' selected':'');b.innerHTML='<span class="name" title="'+c[0]+'">'+c[1]+'</span><span class="bartrack"><span class="bar" style="left:'+(v>=0?50:50-48*Math.abs(v)/scale)+'%;width:'+48*Math.abs(v)/scale+'%;background:'+color(v)+'"></span></span><span class="num">'+fmt(v)+'</span>';b.onclick=()=>select(c);rank.append(b)}
 }
 function updateReadout(){
