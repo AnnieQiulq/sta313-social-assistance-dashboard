@@ -357,3 +357,6 @@ h2 { font-size:18px; }
  .overview-mode .map{overflow:visible!important}
 }
 @media(max-width:1049px){.topcontrols{grid-template-columns:repeat(2,minmax(0,1fr))!important}.extra-controls{flex-wrap:wrap}}
+
+/* Readability review */
+.metric-instruction .instruction-scroll{font-size:14px;line-height:1.55;scrollbar-color:#aeb9c4 #25303c}.metric-instruction .instruction-heading{font-size:13px}.overview-mode .metric-instruction .instruction-scroll{font-size:13px}.map #tooltip{width:410px!important;font-size:16px!important;line-height:1.5;padding:18px 22px;max-height:calc(100vh - 16px);overflow:auto}.map #tooltip strong{display:block;font-size:20px;margin-bottom:12px}.map #tooltip div{margin:7px 0}.map #tooltip .tip-change{font-weight:700;border-top:1px solid #ffffff30;padding-top:9px}.map #tooltip small{display:block;margin-top:12px;color:#d1dbe4;font-size:13px}
